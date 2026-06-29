@@ -1,16 +1,21 @@
 from google import genai
-from app.core.config import GEMINI_API_KEY
-
-client = genai.Client(api_key=GEMINI_API_KEY)
+from app.core.config import settings
 
 
 class GeminiService:
+    def __init__(self):
+        # Create client using centralized config
+        self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
-    @staticmethod
-    def generate_response(prompt: str):
+    def generate_response(self, prompt: str, model: str | None = None) -> str:
+        """
+        Generate response from Gemini model
+        """
 
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
+        model_name = model or settings.MODEL_NAME
+
+        response = self.client.models.generate_content(
+            model=model_name,
             contents=prompt,
         )
 
