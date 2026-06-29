@@ -1,6 +1,6 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
 from pathlib import Path
 
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ✅ OUTSIDE class (IMPORTANT FIX)
 BASE_DIR = Path(__file__).resolve().parents[3]
@@ -16,10 +16,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
     ALLOWED_ORIGINS: str = "http://localhost:3000"
 
-    model_config = SettingsConfigDict(
-        env_file=BASE_DIR / ".env",
-        extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=BASE_DIR / ".env", extra="ignore")
 
 
 settings = Settings()

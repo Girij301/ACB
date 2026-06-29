@@ -1,22 +1,29 @@
-from google import genai
 from app.core.config import settings
+from app.core.logger import logger
+from google import genai
 
 
 class GeminiService:
     def __init__(self):
-        # Create client using centralized config
         self.client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
     def generate_response(self, prompt: str, model: str | None = None) -> str:
-        """
-        Generate response from Gemini model
-        """
-
         model_name = model or settings.MODEL_NAME
 
-        response = self.client.models.generate_content(
-            model=model_name,
-            contents=prompt,
-        )
+        logger.info(f"Gemini Request | Model: {model_name} | Prompt: {prompt}")
 
-        return response.text
+        try:
+            response = self.client.models.generate_content(
+                model=model_name,
+                contents=prompt,
+            )
+
+            result = response.text
+
+            logger.info(f"Gemini Response: {result}")
+
+            return result
+
+        except Exception as e:
+            logger.error(f"Gemini Error: {str(e)}")
+            raise
