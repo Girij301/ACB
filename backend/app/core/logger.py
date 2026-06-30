@@ -7,7 +7,7 @@ from app.core.config import settings
 def setup_logger():
     logger = logging.getLogger("ACB_AI")
 
-    # Avoid duplicate logs
+    
     if logger.handlers:
         return logger
 

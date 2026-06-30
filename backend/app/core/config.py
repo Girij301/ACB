@@ -2,14 +2,14 @@ from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# ✅ OUTSIDE class (IMPORTANT FIX)
+
 BASE_DIR = Path(__file__).resolve().parents[3]
 
 
 class Settings(BaseSettings):
     GEMINI_API_KEY: str
     MODEL_NAME: str = "gemini-2.5-flash"
-
+    MEMORY_LIMIT: int = 20
     HOST: str = "0.0.0.0"
     PORT: int = 8000
     DEBUG: bool = True
