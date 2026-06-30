@@ -1,10 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.chat import router as chat_router
+from app.api.planner import router as planner_router
 from app.core.config import settings
 from app.core.database import Base, engine
-from app.core.exceptions import (AppException, app_exception_handler, generic_exception_handler,)
-from app.models.message import Message
+from app.core.exceptions import (
+    AppException,
+    app_exception_handler,
+    generic_exception_handler,
+)
 
 # Create all database tables
 Base.metadata.create_all(bind=engine)
@@ -32,6 +37,7 @@ app.add_middleware(
 
 # Routes
 app.include_router(chat_router)
+app.include_router(planner_router)
 
 
 @app.get("/")

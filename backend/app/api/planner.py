@@ -1,0 +1,28 @@
+from fastapi import APIRouter
+
+from app.core.logger import logger
+from app.schemas.planner import PlannerRequest, PlannerResponse
+from app.services.plan_memory import save_plan
+from app.services.planner_service import PlannerService
+
+router = APIRouter()
+
+planner_service = PlannerService()
+
+
+@router.post("/planner", response_model=PlannerResponse)
+def create_plan(request: PlannerRequest):
+
+    logger.info(f"Planner request | Session={request.session_id}")
+
+    plan = planner_service.create_plan(request.task)
+
+    save_plan(
+        session_id=request.session_id,
+        user_task=request.task,
+        plan=plan.model_dump(),
+    )
+
+    logger.info("Planner request completed successfully.")
+
+    return plan

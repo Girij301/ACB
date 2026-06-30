@@ -1,9 +1,9 @@
 from fastapi import APIRouter
 
 from app.core.logger import logger
-from app.models.chatmodels import ChatRequest, ChatResponse
+from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.gemini_service import GeminiService
-from app.services.memory import save_message, get_chat_history
+from app.services.memory import get_chat_history, save_message
 
 router = APIRouter()
 
@@ -27,8 +27,12 @@ def chat(request: ChatRequest):
 
     # Build prompt with conversation history
     conversation = (
-    "You are a helpful AI assistant. "
-    "Use the conversation history below to answer the user's latest message.\n\n"
+        "You are ACB AI, a helpful, friendly, and professional AI assistant.\n"
+        "Always respond naturally and conversationally.\n"
+        "When the user greets you (such as 'Hi', 'Hello', or 'Hey'), greet them warmly and offer assistance.\n"
+        "Use the conversation history to maintain context.\n"
+        "If the user asks a question, answer it accurately and clearly.\n\n"
+        "Conversation History:\n"
     )
 
     for msg in history:
@@ -53,8 +57,6 @@ def chat(request: ChatRequest):
     return ChatResponse(
         success=True,
         message="Response generated successfully",
-        data={
-            "response": reply
-        },
-        error=None
+        data={"response": reply},
+        error=None,
     )

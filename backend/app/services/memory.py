@@ -1,10 +1,10 @@
+from app.core.config import settings
 from app.core.database import SessionLocal
 from app.models.message import Message
-from app.core.config import settings
 
-#Save a user or assistant message to the database.
+
+# Save a user or assistant message to the database.
 def save_message(session_id: str, role: str, content: str):
-    
 
     db = SessionLocal()
 
@@ -21,7 +21,9 @@ def save_message(session_id: str, role: str, content: str):
     finally:
         db.close()
 
-#Retrieve all messages for a specific conversation session./most recent
+
+# Retrieve all messages for a specific conversation session./most recent
+
 
 def get_chat_history(session_id: str, limit: int = settings.MEMORY_LIMIT):
     db = SessionLocal()

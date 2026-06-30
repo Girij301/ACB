@@ -1,5 +1,6 @@
-from app.core.logger import logger
 from fastapi.responses import JSONResponse
+
+from app.core.logger import logger
 
 
 class AppException(Exception):
