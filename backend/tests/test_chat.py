@@ -1,19 +1,27 @@
-from fastapi.testclient import TestClient
+from unittest.mock import patch
+
 from app.main import app
+from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
 
-def test_chat_endpoint():
+@patch("app.api.chat.service.generate_response")
+def test_chat_endpoint(mock_generate_response):
+
+    mock_generate_response.return_value = "Hello! How can I help you?"
+
     response = client.post(
         "/chat",
-        json={"message": "hello"}
+        json={
+            "session_id": "test-session",
+            "message": "hello",
+        },
     )
 
     assert response.status_code == 200
 
-    data = response.json()
+    body = response.json()
 
-    assert "success" in data
-    assert "data" in data
-    assert "response" in data["data"]
+    assert body["success"] is True
+    assert body["data"]["response"] == "Hello! How can I help you?"

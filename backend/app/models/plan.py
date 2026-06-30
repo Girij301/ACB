@@ -1,8 +1,7 @@
-from datetime import datetime
-
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from datetime import UTC, datetime
 
 from app.core.database import Base
+from sqlalchemy import Column, DateTime, Integer, String, Text
 
 
 class Plan(Base):
@@ -16,4 +15,4 @@ class Plan(Base):
 
     plan = Column(Text, nullable=False)
 
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)

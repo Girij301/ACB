@@ -1,10 +1,12 @@
 from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[3]
-WORKSPACE_DIR = BASE_DIR / "workspace" 
+WORKSPACE_DIR = BASE_DIR / "workspace"
 
 WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
+
 
 class Settings(BaseSettings):
     GEMINI_API_KEY: str

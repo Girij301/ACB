@@ -1,9 +1,8 @@
-from fastapi import APIRouter
-
 from app.core.logger import logger
 from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.gemini_service import GeminiService
 from app.services.memory import get_chat_history, save_message
+from fastapi import APIRouter
 
 router = APIRouter()
 

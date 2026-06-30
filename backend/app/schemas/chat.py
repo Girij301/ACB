@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
-
 from app.schemas.base import APIResponse
+from pydantic import BaseModel, Field
 
 
 class ChatRequest(BaseModel):

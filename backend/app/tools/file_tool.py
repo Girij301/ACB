@@ -4,10 +4,10 @@ from app.core.config import settings
 
 
 def get_safe_path(relative_path: str) -> Path:
-    
-    #Resolve a user-provided path safely inside the workspace.
 
-    #Raises:ValueError: If the resolved path is outside the workspace.
+    # Resolve a user-provided path safely inside the workspace.
+
+    # Raises:ValueError: If the resolved path is outside the workspace.
     workspace = settings.WORKSPACE_DIR.resolve()
     target = (workspace / relative_path).resolve()
 
@@ -16,11 +16,14 @@ def get_safe_path(relative_path: str) -> Path:
 
     return target
 
+
 """Provides safe filesystem operations inside the workspace."""
+
+
 class FileTool:
 
     def create_file(self, relative_path: str, content: str = "") -> Path:
-    
+
         file_path = get_safe_path(relative_path)
 
         if file_path.exists():
@@ -30,18 +33,18 @@ class FileTool:
         file_path.write_text(content, encoding="utf-8")
 
         return file_path
-    
+
     def read_file(self, relative_path: str) -> str:
-        
+
         file_path = get_safe_path(relative_path)
 
         if not file_path.exists():
             raise FileNotFoundError(f"File '{relative_path}' does not exist.")
 
         return file_path.read_text(encoding="utf-8")
-    
+
     def write_file(self, relative_path: str, content: str) -> Path:
-    
+
         file_path = get_safe_path(relative_path)
 
         if not file_path.exists():
@@ -50,9 +53,9 @@ class FileTool:
         file_path.write_text(content, encoding="utf-8")
 
         return file_path
-    
+
     def append_file(self, relative_path: str, content: str) -> Path:
-    
+
         file_path = get_safe_path(relative_path)
 
         if not file_path.exists():
@@ -62,9 +65,9 @@ class FileTool:
             file.write(content)
 
         return file_path
-    
+
     def delete_file(self, relative_path: str) -> Path:
-   
+
         file_path = get_safe_path(relative_path)
 
         if not file_path.exists():
@@ -76,33 +79,27 @@ class FileTool:
         file_path.unlink()
 
         return file_path
-    
+
     def create_directory(self, relative_path: str) -> Path:
-    
+
         directory_path = get_safe_path(relative_path)
 
         if directory_path.exists():
-            raise FileExistsError(
-                f"Directory '{relative_path}' already exists."
-            )
+            raise FileExistsError(f"Directory '{relative_path}' already exists.")
 
         directory_path.mkdir(parents=True)
 
         return directory_path
-    
+
     def list_directory(self, relative_path: str = "") -> list[dict]:
-    
+
         directory_path = get_safe_path(relative_path)
 
         if not directory_path.exists():
-            raise FileNotFoundError(
-                f"Directory '{relative_path}' does not exist."
-            )
+            raise FileNotFoundError(f"Directory '{relative_path}' does not exist.")
 
         if not directory_path.is_dir():
-            raise NotADirectoryError(
-                f"'{relative_path}' is not a directory."
-            )
+            raise NotADirectoryError(f"'{relative_path}' is not a directory.")
 
         items = []
 
@@ -111,13 +108,13 @@ class FileTool:
                 {
                     "name": item.name,
                     "type": "directory" if item.is_dir() else "file",
-                    "path": str(item.relative_to(settings.WORKSPACE_DIR))
+                    "path": str(item.relative_to(settings.WORKSPACE_DIR)),
                 }
             )
 
         return items
-    
+
     def exists(self, relative_path: str) -> bool:
-    
+
         path = get_safe_path(relative_path)
         return path.exists()

@@ -1,7 +1,6 @@
-from google import genai
-
 from app.core.config import settings
 from app.core.logger import logger
+from google import genai
 
 
 class GeminiService:

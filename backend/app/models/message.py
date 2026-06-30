@@ -1,8 +1,7 @@
-from datetime import datetime
-
-from sqlalchemy import Column, DateTime, Integer, String, Text
+from datetime import UTC, datetime
 
 from app.core.database import Base
+from sqlalchemy import Column, DateTime, Integer, String, Text
 
 
 class Message(Base):
@@ -16,4 +15,7 @@ class Message(Base):
 
     content = Column(Text)
 
-    timestamp = Column(DateTime, default=datetime.utcnow)
+    timestamp = Column(
+        DateTime,
+        default=lambda: datetime.now(UTC),
+    )
