@@ -1,7 +1,6 @@
+from app.core.config import BASE_DIR
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-
-from app.core.config import BASE_DIR
 
 DATABASE_PATH = BASE_DIR / "chat.db"
 DATABASE_URL = f"sqlite:///{DATABASE_PATH}"

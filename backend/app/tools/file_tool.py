@@ -3,14 +3,28 @@ from pathlib import Path
 from app.core.config import settings
 from app.utils.path_utils import get_safe_path
 
-"""Provides safe filesystem operations inside the workspace."""
-
 
 class FileTool:
+    """
+    Provides safe filesystem operations inside the workspace.
+    """
 
-    def create_file(self, relative_path: str, content: str = "") -> Path:
+    def __init__(
+        self,
+        workspace: Path | None = None,
+    ) -> None:
+        self.workspace = workspace or settings.WORKSPACE_DIR
 
-        file_path = get_safe_path(relative_path)
+    def create_file(
+        self,
+        relative_path: str,
+        content: str = "",
+    ) -> Path:
+
+        file_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if file_path.exists():
             raise FileExistsError(f"File '{relative_path}' already exists.")
@@ -20,18 +34,31 @@ class FileTool:
 
         return file_path
 
-    def read_file(self, relative_path: str) -> str:
+    def read_file(
+        self,
+        relative_path: str,
+    ) -> str:
 
-        file_path = get_safe_path(relative_path)
+        file_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if not file_path.exists():
             raise FileNotFoundError(f"File '{relative_path}' does not exist.")
 
         return file_path.read_text(encoding="utf-8")
 
-    def write_file(self, relative_path: str, content: str) -> Path:
+    def write_file(
+        self,
+        relative_path: str,
+        content: str,
+    ) -> Path:
 
-        file_path = get_safe_path(relative_path)
+        file_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if not file_path.exists():
             raise FileNotFoundError(f"File '{relative_path}' does not exist.")
@@ -40,9 +67,16 @@ class FileTool:
 
         return file_path
 
-    def append_file(self, relative_path: str, content: str) -> Path:
+    def append_file(
+        self,
+        relative_path: str,
+        content: str,
+    ) -> Path:
 
-        file_path = get_safe_path(relative_path)
+        file_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if not file_path.exists():
             raise FileNotFoundError(f"File '{relative_path}' does not exist.")
@@ -52,9 +86,15 @@ class FileTool:
 
         return file_path
 
-    def delete_file(self, relative_path: str) -> Path:
+    def delete_file(
+        self,
+        relative_path: str,
+    ) -> Path:
 
-        file_path = get_safe_path(relative_path)
+        file_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if not file_path.exists():
             raise FileNotFoundError(f"File '{relative_path}' does not exist.")
@@ -66,9 +106,15 @@ class FileTool:
 
         return file_path
 
-    def create_directory(self, relative_path: str) -> Path:
+    def create_directory(
+        self,
+        relative_path: str,
+    ) -> Path:
 
-        directory_path = get_safe_path(relative_path)
+        directory_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if directory_path.exists():
             raise FileExistsError(f"Directory '{relative_path}' already exists.")
@@ -77,9 +123,15 @@ class FileTool:
 
         return directory_path
 
-    def list_directory(self, relative_path: str = "") -> list[dict]:
+    def list_directory(
+        self,
+        relative_path: str = "",
+    ) -> list[dict]:
 
-        directory_path = get_safe_path(relative_path)
+        directory_path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
 
         if not directory_path.exists():
             raise FileNotFoundError(f"Directory '{relative_path}' does not exist.")
@@ -94,13 +146,20 @@ class FileTool:
                 {
                     "name": item.name,
                     "type": "directory" if item.is_dir() else "file",
-                    "path": str(item.relative_to(settings.WORKSPACE_DIR)),
+                    "path": str(item.relative_to(self.workspace)),
                 }
             )
 
         return items
 
-    def exists(self, relative_path: str) -> bool:
+    def exists(
+        self,
+        relative_path: str,
+    ) -> bool:
 
-        path = get_safe_path(relative_path)
+        path = get_safe_path(
+            relative_path,
+            workspace=self.workspace,
+        )
+
         return path.exists()

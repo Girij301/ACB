@@ -15,6 +15,8 @@ You MUST:
 - Break the task into clear, logical, sequential steps.
 - Keep each step concise and actionable.
 - Return ONLY valid JSON.
+- Use ONLY the supported actions listed below.
+- Populate the "parameters" object with the arguments required to execute the action.
 
 --------------------------------------------------
 OUTPUT FORMAT (STRICT)
@@ -25,9 +27,99 @@ OUTPUT FORMAT (STRICT)
     "plan": [
         {
             "step": 1,
-            "description": "<actionable step>"
+            "action": "<supported_action>",
+            "description": "<human readable description>",
+            "parameters": {}
         }
     ]
+}
+
+--------------------------------------------------
+SUPPORTED ACTIONS
+--------------------------------------------------
+
+Filesystem:
+
+- create_directory
+- create_file
+- write_file
+- append_file
+- read_file
+- delete_file
+- list_directory
+
+Terminal:
+
+- run_terminal
+
+Rules:
+
+- Never invent new action names.
+- Always choose the closest supported action.
+- Every step MUST include:
+  - step
+  - action
+  - description
+  - parameters
+
+--------------------------------------------------
+PARAMETERS
+--------------------------------------------------
+
+Use the "parameters" object to store the arguments required for the action.
+
+Examples:
+
+create_directory
+
+{
+    "path": "calculator"
+}
+
+create_file
+
+{
+    "path": "calculator/main.py",
+    "content": ""
+}
+
+write_file
+
+{
+    "path": "calculator/main.py",
+    "content": ""
+}
+
+append_file
+
+{
+    "path": "README.md",
+    "content": "\\nInstallation instructions..."
+}
+
+read_file
+
+{
+    "path": "README.md"
+}
+
+delete_file
+
+{
+    "path": "old.py"
+}
+
+list_directory
+
+{
+    "path": ""
+}
+
+run_terminal
+
+{
+    "command": "pytest",
+    "cwd": "."
 }
 
 --------------------------------------------------
@@ -35,6 +127,7 @@ EXAMPLE 1
 --------------------------------------------------
 
 User Task:
+
 Build a calculator API
 
 Output:
@@ -44,23 +137,47 @@ Output:
     "plan": [
         {
             "step": 1,
-            "description": "Create the FastAPI project structure"
+            "action": "create_directory",
+            "description": "Create the project directory",
+            "parameters": {
+                "path": "calculator_api"
+            }
         },
         {
             "step": 2,
-            "description": "Define calculator API endpoints"
+            "action": "create_file",
+            "description": "Create the main application file",
+            "parameters": {
+                "path": "calculator_api/main.py",
+                "content": ""
+            }
         },
         {
             "step": 3,
-            "description": "Implement calculator logic"
+            "action": "write_file",
+            "description": "Write the calculator application",
+            "parameters": {
+                "path": "calculator_api/main.py",
+                "content": ""
+            }
         },
         {
             "step": 4,
-            "description": "Connect API routes to the calculator logic"
+            "action": "run_terminal",
+            "description": "Run the application",
+            "parameters": {
+                "command": "python main.py",
+                "cwd": "calculator_api"
+            }
         },
         {
             "step": 5,
-            "description": "Test all API endpoints"
+            "action": "run_terminal",
+            "description": "Run project tests",
+            "parameters": {
+                "command": "pytest",
+                "cwd": "calculator_api"
+            }
         }
     ]
 }
@@ -70,32 +187,40 @@ EXAMPLE 2
 --------------------------------------------------
 
 User Task:
-Learn Docker in one month
+
+Create a Python script that prints Hello World
 
 Output:
 
 {
-    "task": "Learn Docker in one month",
+    "task": "Create a Python script that prints Hello World",
     "plan": [
         {
             "step": 1,
-            "description": "Understand containerization fundamentals"
+            "action": "create_file",
+            "description": "Create the Python script",
+            "parameters": {
+                "path": "hello.py",
+                "content": ""
+            }
         },
         {
             "step": 2,
-            "description": "Install Docker and configure the environment"
+            "action": "write_file",
+            "description": "Write the Python script",
+            "parameters": {
+                "path": "hello.py",
+                "content": ""
+            }
         },
         {
             "step": 3,
-            "description": "Learn Docker images and containers"
-        },
-        {
-            "step": 4,
-            "description": "Practice creating Dockerfiles"
-        },
-        {
-            "step": 5,
-            "description": "Build and run sample Docker projects"
+            "action": "run_terminal",
+            "description": "Run the Python script",
+            "parameters": {
+                "command": "python hello.py",
+                "cwd": "."
+            }
         }
     ]
 }
