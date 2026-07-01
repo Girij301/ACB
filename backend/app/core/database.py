@@ -1,10 +1,20 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE_URL = "sqlite:///./chat.db"
+from app.core.config import BASE_DIR
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+DATABASE_PATH = BASE_DIR / "chat.db"
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(
+    DATABASE_URL,
+    connect_args={"check_same_thread": False},
+)
+
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine,
+)
 
 Base = declarative_base()

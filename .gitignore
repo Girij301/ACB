@@ -1,5 +1,6 @@
 # Python
 venv/
+.venv/
 __pycache__/
 *.pyc
 *.pyo
@@ -29,5 +30,16 @@ Thumbs.db
 dist/
 build/
 
-#Model projects file 
+# AI generated projects
 workspace/
+
+# SQLite
+chat.db
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Coverage (optional, if you use pytest-cov)
+.coverage
+htmlcov/
