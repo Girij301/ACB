@@ -1,5 +1,5 @@
 from pathlib import Path
-
+from app.schemas.planner import PlanStep
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
 from app.schemas.execution import ExecutionResult
@@ -22,7 +22,7 @@ class ExecutionService:
     def execute_plan(
         self,
         *,
-        plan: list[dict],
+        plan: list[PlanStep],
         workspace: Path,
         plan_id: int,
     ) -> ExecutionResult:

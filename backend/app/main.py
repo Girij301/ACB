@@ -1,4 +1,5 @@
 from app.api.chat import router as chat_router
+from app.api.execute import router as execute_router
 from app.api.file import router as file_router
 from app.api.planner import router as planner_router
 from app.api.terminal import router as terminal_router
@@ -47,6 +48,7 @@ app.include_router(chat_router)
 app.include_router(planner_router)
 app.include_router(file_router)
 app.include_router(terminal_router)
+app.include_router(execute_router)
 
 
 @app.get("/")
