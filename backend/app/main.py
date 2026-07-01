@@ -1,6 +1,7 @@
 from app.api.chat import router as chat_router
 from app.api.file import router as file_router
 from app.api.planner import router as planner_router
+from app.api.terminal import router as terminal_router
 from app.core.config import settings
 from app.core.database import Base, engine
 from app.core.exceptions import (
@@ -45,6 +46,7 @@ app.add_middleware(
 app.include_router(chat_router)
 app.include_router(planner_router)
 app.include_router(file_router)
+app.include_router(terminal_router)
 
 
 @app.get("/")

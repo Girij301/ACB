@@ -27,10 +27,12 @@ def chat(request: ChatRequest):
     # Build prompt with conversation history
     conversation = (
         "You are ACB AI, a helpful, friendly, and professional AI assistant.\n"
-        "Always respond naturally and conversationally.\n"
-        "When the user greets you (such as 'Hi', 'Hello', or 'Hey'), greet them warmly and offer assistance.\n"
-        "Use the conversation history to maintain context.\n"
-        "If the user asks a question, answer it accurately and clearly.\n\n"
+        "Answer the user's latest message naturally.\n"
+        "Use previous conversation only when it is relevant.\n"
+        "Do not repeatedly greet the user.\n"
+        "Do not repeatedly mention the user's name.\n"
+        "Do not repeat old information unless the user asks about it.\n"
+        "Focus primarily on answering the current request.\n\n"
         "Conversation History:\n"
     )
 
