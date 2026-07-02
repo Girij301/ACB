@@ -43,5 +43,6 @@ class AgentService:
         return self.execution_service.execute_plan(
             plan=planner_response.plan,
             workspace=settings.WORKSPACE_DIR,
+            session_id=request.session_id,
             plan_id=1,
         )

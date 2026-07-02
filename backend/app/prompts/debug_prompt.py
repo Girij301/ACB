@@ -9,19 +9,19 @@ Return ONLY valid JSON.
 
 The JSON must follow this schema exactly:
 
-{
+{{
   "summary": "Short summary of the fix",
   "explanation": "Detailed explanation of why the failure happened and how to fix it",
   "files": [
-    {
+    {{
       "path": "relative/file/path.py",
       "content": "Complete updated file content"
-    }
+    }}
   ],
   "commands": [
     "terminal command if needed"
   ]
-}
+}}
 
 Rules:
 - Return only valid JSON.

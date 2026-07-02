@@ -25,6 +25,7 @@ class ExecutionService:
         *,
         plan: list[PlanStep],
         workspace: Path,
+        session_id: str,
         plan_id: int,
     ) -> ExecutionResult:
         """
@@ -41,6 +42,7 @@ class ExecutionService:
 
         context = ExecutionContext(
             workspace=workspace,
+            session_id=session_id,
             plan_id=plan_id,
         )
 
