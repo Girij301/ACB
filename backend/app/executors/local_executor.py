@@ -41,6 +41,7 @@ class LocalExecutor(BaseExecutor):
 
             return {
                 "success": result.returncode == 0,
+                "action": "run_terminal",
                 "command": command,
                 "cwd": cwd,
                 "stdout": result.stdout,
@@ -54,6 +55,8 @@ class LocalExecutor(BaseExecutor):
 
             return {
                 "success": False,
+                "action": "run_terminal",
+                "error_type": "TimeoutExpired",
                 "command": command,
                 "cwd": cwd,
                 "stdout": "",
@@ -67,6 +70,8 @@ class LocalExecutor(BaseExecutor):
 
             return {
                 "success": False,
+                "action": "run_terminal",
+                "error_type": "FileNotFoundError",
                 "command": command,
                 "cwd": cwd,
                 "stdout": "",
@@ -80,6 +85,8 @@ class LocalExecutor(BaseExecutor):
 
             return {
                 "success": False,
+                "action": "run_terminal",
+                "error_type": type(e).__name__,
                 "command": command,
                 "cwd": cwd,
                 "stdout": "",

@@ -54,15 +54,15 @@ class FailureAnalyzer:
 
         # Terminal failures
         if action == ActionType.RUN_TERMINAL.value:
+            exit_code = output.get("exit_code", -1)
+
             return FailureAnalysis(
                 category=FailureCategory.TERMINAL,
-                retryable=True,
-                reason=output.get(
-                    "stderr",
-                    output.get(
-                        "error",
-                        "Terminal error.",
-                    ),
+                retryable=exit_code != 0,
+                reason=(
+                    output.get("stderr")
+                    or output.get("error")
+                    or "Terminal error."
                 ),
             )
 

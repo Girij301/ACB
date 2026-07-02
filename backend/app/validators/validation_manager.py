@@ -15,13 +15,11 @@ class ValidationManager:
         self,
         validators: list[BaseValidator] | None = None,
     ) -> None:
-        print("validators =", validators)
 
         if validators is None:
             self.validators: list[BaseValidator] = []
 
             if settings.ENABLE_VALIDATION:
-                print("Registering defaults")
                 self._register_default_validators()
         else:
             self.validators = validators

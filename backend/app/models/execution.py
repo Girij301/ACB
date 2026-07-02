@@ -1,4 +1,4 @@
-from datetime import UTC, datetime
+from datetime import datetime
 
 from app.core.database import Base
 from sqlalchemy import Column, DateTime, Integer, String
@@ -10,34 +10,86 @@ class Execution(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    session_id = Column(String, index=True, nullable=False)
-    plan_id = Column(Integer, index=True, nullable=False)
+    session_id = Column(
+        String,
+        index=True,
+        nullable=False,
+    )
 
-    status = Column(String, nullable=False)
+    plan_id = Column(
+        Integer,
+        index=True,
+        nullable=False,
+    )
 
-    started_at = Column(DateTime, nullable=False)
-    completed_at = Column(DateTime, nullable=True)
+    status = Column(
+        String,
+        nullable=False,
+    )
 
-    duration_ms = Column(Integer, default=0, nullable=False)
+    started_at = Column(
+        DateTime,
+        nullable=False,
+        default=datetime.utcnow,
+    )
 
-    total_steps = Column(Integer, default=0, nullable=False)
-    successful_steps = Column(Integer, default=0, nullable=False)
-    failed_steps = Column(Integer, default=0, nullable=False)
+    completed_at = Column(
+        DateTime,
+        nullable=True,
+    )
 
-    retry_count = Column(Integer, default=0, nullable=False)
-    debug_count = Column(Integer, default=0, nullable=False)
-    validation_count = Column(Integer, default=0, nullable=False)
+    duration_ms = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    total_steps = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    successful_steps = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    failed_steps = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    retry_count = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    debug_count = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
+
+    validation_count = Column(
+        Integer,
+        default=0,
+        nullable=False,
+    )
 
     created_at = Column(
         DateTime,
-        default=lambda: datetime.now(UTC),
+        default=datetime.utcnow,
         nullable=False,
     )
 
     updated_at = Column(
         DateTime,
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
+        default=datetime.utcnow,
+        onupdate=datetime.utcnow,
         nullable=False,
     )
 

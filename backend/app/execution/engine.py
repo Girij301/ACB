@@ -7,7 +7,10 @@ from app.execution.step_executor import StepExecutor
 from app.execution.validation_engine import ValidationEngine
 from app.schemas.execution import ExecutionResult, ExecutionStatus
 from app.schemas.execution_memory import ExecutionMemory
-from app.services.execution_persistence_service import ExecutionPersistenceService
+from app.schemas.planner import PlanStep
+from app.services.execution_persistence_service import (
+    ExecutionPersistenceService,
+)
 
 
 class ExecutionEngine:
@@ -33,7 +36,7 @@ class ExecutionEngine:
 
     def execute(
         self,
-        plan: list,
+        plan: list[PlanStep],
         context: ExecutionContext,
     ) -> ExecutionResult:
         """
@@ -117,13 +120,24 @@ class ExecutionEngine:
                     continue
 
                 logger.error(
-                    f"Step {step.step} failed after " f"{memory.retry_count} retries."
+                    f"Step {step.step} failed after "
+                    f"{memory.retry_count} retries."
                 )
 
                 memory.increment_ai_fix_attempt()
 
                 if memory.ai_fix_attempts > self.retry_engine.max_ai_fix_attempts:
+
                     logger.error("Maximum AI fix attempts reached.")
+
+                    if (
+                        self.persistence_service is not None
+                        and context.execution is not None
+                    ):
+                        self.persistence_service.complete_execution(
+                            execution=context.execution,
+                            success=False,
+                        )
 
                     return ExecutionResult(
                         success=False,
@@ -135,7 +149,8 @@ class ExecutionEngine:
                 debug_result = self.debug_manager.debug(
                     result=result,
                     history=[
-                        step_result.model_dump() for step_result in memory.step_results
+                        step_result.model_dump()
+                        for step_result in memory.step_results
                     ],
                     workspace=context.workspace,
                 )
@@ -161,14 +176,18 @@ class ExecutionEngine:
 
                 memory.reset_retry()
 
-                continue
-
         validation = self.validation_engine.validate(
             context=context,
-            history=[step_result.model_dump() for step_result in memory.step_results],
+            history=[
+                step_result.model_dump()
+                for step_result in memory.step_results
+            ],
         )
 
-        if self.persistence_service is not None and context.execution is not None:
+        if (
+            self.persistence_service is not None
+            and context.execution is not None
+        ):
             for validation_result in validation.results:
                 self.persistence_service.record_validation(
                     execution=context.execution,
@@ -179,12 +198,30 @@ class ExecutionEngine:
 
             logger.error("Workspace validation failed.")
 
+            if (
+                self.persistence_service is not None
+                and context.execution is not None
+            ):
+                self.persistence_service.complete_execution(
+                    execution=context.execution,
+                    success=False,
+                )
+
             return ExecutionResult(
                 success=False,
                 steps=memory.step_results,
             )
 
         logger.info("Workspace validation passed.")
+
+        if (
+            self.persistence_service is not None
+            and context.execution is not None
+        ):
+            self.persistence_service.complete_execution(
+                execution=context.execution,
+                success=True,
+            )
 
         return ExecutionResult(
             success=True,

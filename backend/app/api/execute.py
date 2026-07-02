@@ -1,22 +1,16 @@
 from app.schemas.execute import ExecuteRequest
-from app.schemas.execution import ExecutionResult
 from app.services.agent_service import AgentService
 from fastapi import APIRouter
+from sqlalchemy.orm import Session
+from fastapi import Depends
+from app.core.database import get_db
 
 router = APIRouter()
 
-agent_service = AgentService()
-
-
-@router.post(
-    "/execute",
-    response_model=ExecutionResult,
-    tags=["Execution"],
-)
+@router.post("/execute")
 def execute(
     request: ExecuteRequest,
-) -> ExecutionResult:
-    """
-    Generate a plan using Gemini and execute it.
-    """
+    db: Session = Depends(get_db),
+):
+    agent_service = AgentService(db=db)
     return agent_service.execute(request)

@@ -15,9 +15,13 @@ class ValidationRepository:
         self,
         validation: ValidationRecord,
     ) -> ValidationRecord:
+
+
         self.db.add(validation)
         self.db.commit()
         self.db.refresh(validation)
+
+
         return validation
 
     def get_by_id(

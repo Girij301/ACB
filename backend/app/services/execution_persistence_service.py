@@ -1,4 +1,5 @@
-from datetime import UTC, datetime
+import json
+from datetime import datetime
 
 from app.models.debug_record import DebugRecord
 from app.models.execution import Execution
@@ -50,7 +51,7 @@ class ExecutionPersistenceService:
             session_id=session_id,
             plan_id=plan_id,
             status=ExecutionStatus.RUNNING.value,
-            started_at=datetime.now(UTC),
+            started_at=datetime.utcnow(),
         )
 
         return self.execution_repository.create(execution)
@@ -65,7 +66,7 @@ class ExecutionPersistenceService:
         the final execution metadata.
         """
 
-        completed_at = datetime.now(UTC)
+        completed_at = datetime.utcnow()
 
         execution.completed_at = completed_at
 
@@ -75,7 +76,9 @@ class ExecutionPersistenceService:
             )
 
         execution.status = (
-            ExecutionStatus.SUCCESS.value if success else ExecutionStatus.FAILED.value
+            ExecutionStatus.SUCCESS.value
+            if success
+            else ExecutionStatus.FAILED.value
         )
 
         return self.execution_repository.update(execution)
@@ -90,7 +93,7 @@ class ExecutionPersistenceService:
         Persist a single execution step.
         """
 
-        now = datetime.now(UTC)
+        now = datetime.utcnow()
 
         execution_step = ExecutionStep(
             execution_id=execution.id,
@@ -99,19 +102,27 @@ class ExecutionPersistenceService:
             description=step.description,
             status=(
                 StepStatus.SUCCESS.value
-                if result.status.name == "SUCCESS"
+                if result.status == ExecutionStatus.SUCCESS
                 else StepStatus.FAILED.value
             ),
             tool_name=None,
-            output=getattr(result, "output", None),
-            error=result.error,
+            output=(
+                json.dumps(result.output, indent=2)
+                if result.output is not None
+                else None
+            ),
+            error=(
+                result.output.get("error")
+                if isinstance(result.output, dict)
+                else None
+            ),
             duration_ms=0,
             started_at=now,
             completed_at=now,
         )
 
         return self.execution_step_repository.create(execution_step)
-
+#tempo
     def record_validation(
         self,
         execution: Execution,
@@ -125,12 +136,18 @@ class ExecutionPersistenceService:
             execution_id=execution.id,
             validator_name=validation_result.validator,
             passed=validation_result.success,
-            stdout=getattr(validation_result, "stdout", None),
-            stderr=getattr(validation_result, "stderr", None),
-            duration_ms=getattr(validation_result, "duration_ms", 0),
+            stdout=None,
+            stderr=None,
+            duration_ms=0,
         )
 
-        return self.validation_repository.create(record)
+        print("Calling ValidationRepository.create()...")
+
+        saved = self.validation_repository.create(record)
+
+        print("Validation saved successfully. ID =", saved.id)
+
+        return saved
 
     def record_retry(
         self,

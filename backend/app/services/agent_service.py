@@ -1,3 +1,5 @@
+from sqlalchemy.orm import Session
+
 from app.core.config import settings
 from app.schemas.execute import ExecuteRequest
 from app.schemas.execution import ExecutionResult
@@ -10,23 +12,38 @@ class AgentService:
     High-level orchestration service for the AI agent.
 
     Flow:
-        User Task
-            ↓
-        PlannerService
-            ↓
-        ExecutionService
-            ↓
-        ExecutionResult
+
+        User Request
+             │
+             ▼
+      PlannerService
+             │
+             ▼
+     ExecutionService
+             │
+             ▼
+      ExecutionEngine
+             │
+             ▼
+    ExecutionPersistenceService
+             │
+             ▼
+        Repository Layer
     """
 
     def __init__(
         self,
+        db: Session,
         planner_service: PlannerService | None = None,
         execution_service: ExecutionService | None = None,
     ) -> None:
+
         self.planner_service = planner_service or PlannerService()
 
-        self.execution_service = execution_service or ExecutionService()
+        self.execution_service = (
+            execution_service
+            or ExecutionService(db=db)
+        )
 
     def execute(
         self,

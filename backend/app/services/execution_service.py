@@ -1,9 +1,23 @@
 from pathlib import Path
 
+from sqlalchemy.orm import Session
+
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
+from app.repositories.debug_repository import DebugRepository
+from app.repositories.execution_repository import ExecutionRepository
+from app.repositories.execution_step_repository import (
+    ExecutionStepRepository,
+)
+from app.repositories.retry_repository import RetryRepository
+from app.repositories.validation_repository import (
+    ValidationRepository,
+)
 from app.schemas.execution import ExecutionResult
 from app.schemas.planner import PlanStep
+from app.services.execution_persistence_service import (
+    ExecutionPersistenceService,
+)
 
 
 class ExecutionService:
@@ -16,9 +30,25 @@ class ExecutionService:
 
     def __init__(
         self,
+        db: Session,
         engine: ExecutionEngine | None = None,
     ) -> None:
-        self.engine = engine or ExecutionEngine()
+
+        persistence_service = ExecutionPersistenceService(
+            execution_repository=ExecutionRepository(db),
+            execution_step_repository=ExecutionStepRepository(db),
+            validation_repository=ValidationRepository(db),
+            retry_repository=RetryRepository(db),
+            debug_repository=DebugRepository(db),
+        )
+
+        if engine is None:
+            self.engine = ExecutionEngine(
+                persistence_service=persistence_service,
+            )
+        else:
+            self.engine = engine
+            self.engine.persistence_service = persistence_service
 
     def execute_plan(
         self,
@@ -34,6 +64,7 @@ class ExecutionService:
         Args:
             plan: Planner output.
             workspace: Workspace directory.
+            session_id: Current execution session.
             plan_id: Database identifier for the plan.
 
         Returns:
