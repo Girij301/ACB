@@ -13,6 +13,7 @@ def test_run_terminal_command():
 
     context = ExecutionContext(
         workspace=Path("."),
+        session_id="test-session",
         plan_id=1,
     )
 

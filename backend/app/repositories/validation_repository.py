@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.validation_record import ValidationRecord
+from sqlalchemy.orm import Session
 
 
 class ValidationRepository:

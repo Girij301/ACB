@@ -2,10 +2,7 @@ from pathlib import Path
 
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
-from app.schemas.planner import (
-    ActionType,
-    PlanStep,
-)
+from app.schemas.planner import ActionType, PlanStep
 from app.schemas.validation import ValidationResult
 from app.schemas.validation_execution import ValidationExecutionResult
 
@@ -37,6 +34,7 @@ def test_execution_engine_creates_real_file(tmp_path: Path):
 
     context = ExecutionContext(
         workspace=tmp_path,
+        session_id="test-session",
         plan_id=1,
     )
 
@@ -62,7 +60,4 @@ def test_execution_engine_creates_real_file(tmp_path: Path):
     created_file = tmp_path / "hello.txt"
 
     assert created_file.exists()
-    assert (
-        created_file.read_text()
-        == "Hello from ExecutionEngine"
-    )
+    assert created_file.read_text() == "Hello from ExecutionEngine"

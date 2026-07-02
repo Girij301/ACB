@@ -3,10 +3,7 @@ from pathlib import Path
 from app.execution.context import ExecutionContext
 from app.execution.step_executor import StepExecutor
 from app.schemas.execution import ExecutionStatus
-from app.schemas.planner import (
-    ActionType,
-    PlanStep,
-)
+from app.schemas.planner import ActionType, PlanStep
 
 
 def test_create_file(tmp_path: Path):
@@ -17,6 +14,7 @@ def test_create_file(tmp_path: Path):
 
     context = ExecutionContext(
         workspace=tmp_path,
+        session_id="test-session",
         plan_id=1,
     )
 
@@ -29,7 +27,7 @@ def test_create_file(tmp_path: Path):
         parameters={
             "relative_path": "hello.txt",
             "content": "Hello World",
-        }
+        },
     )
 
     result = executor.execute(

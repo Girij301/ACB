@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.retry_record import RetryRecord
+from sqlalchemy.orm import Session
 
 
 class RetryRepository:
@@ -25,11 +24,7 @@ class RetryRepository:
         self,
         retry_id: int,
     ) -> RetryRecord | None:
-        return (
-            self.db.query(RetryRecord)
-            .filter(RetryRecord.id == retry_id)
-            .first()
-        )
+        return self.db.query(RetryRecord).filter(RetryRecord.id == retry_id).first()
 
     def list_by_execution(
         self,

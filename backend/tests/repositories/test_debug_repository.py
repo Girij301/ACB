@@ -1,12 +1,11 @@
 from datetime import UTC, datetime
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
 from app.core.database import Base
 from app.models.debug_record import DebugRecord
 from app.models.execution import Execution
 from app.repositories.debug_repository import DebugRepository
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = "sqlite:///:memory:"
 

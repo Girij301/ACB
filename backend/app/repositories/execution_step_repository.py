@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.execution_step import ExecutionStep
+from sqlalchemy.orm import Session
 
 
 class ExecutionStepRepository:
@@ -19,11 +18,7 @@ class ExecutionStepRepository:
         return step
 
     def get_by_id(self, step_id: int) -> ExecutionStep | None:
-        return (
-            self.db.query(ExecutionStep)
-            .filter(ExecutionStep.id == step_id)
-            .first()
-        )
+        return self.db.query(ExecutionStep).filter(ExecutionStep.id == step_id).first()
 
     def list_by_execution(
         self,

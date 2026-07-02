@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.execution import Execution
+from sqlalchemy.orm import Session
 
 
 class ExecutionRepository:
@@ -19,18 +18,10 @@ class ExecutionRepository:
         return execution
 
     def get_by_id(self, execution_id: int) -> Execution | None:
-        return (
-            self.db.query(Execution)
-            .filter(Execution.id == execution_id)
-            .first()
-        )
+        return self.db.query(Execution).filter(Execution.id == execution_id).first()
 
     def list(self) -> list[Execution]:
-        return (
-            self.db.query(Execution)
-            .order_by(Execution.created_at.desc())
-            .all()
-        )
+        return self.db.query(Execution).order_by(Execution.created_at.desc()).all()
 
     def update(self, execution: Execution) -> Execution:
         self.db.commit()

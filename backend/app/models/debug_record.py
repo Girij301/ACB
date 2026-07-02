@@ -1,14 +1,7 @@
 from datetime import UTC, datetime
 
 from app.core.database import Base
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    Text,
-)
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
 

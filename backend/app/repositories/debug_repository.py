@@ -1,6 +1,5 @@
-from sqlalchemy.orm import Session
-
 from app.models.debug_record import DebugRecord
+from sqlalchemy.orm import Session
 
 
 class DebugRepository:
@@ -26,9 +25,7 @@ class DebugRepository:
         debug_record_id: int,
     ) -> DebugRecord | None:
         return (
-            self.db.query(DebugRecord)
-            .filter(DebugRecord.id == debug_record_id)
-            .first()
+            self.db.query(DebugRecord).filter(DebugRecord.id == debug_record_id).first()
         )
 
     def list_by_execution(
