@@ -60,9 +60,7 @@ class FailureAnalyzer:
                 category=FailureCategory.TERMINAL,
                 retryable=exit_code != 0,
                 reason=(
-                    output.get("stderr")
-                    or output.get("error")
-                    or "Terminal error."
+                    output.get("stderr") or output.get("error") or "Terminal error."
                 ),
             )
 

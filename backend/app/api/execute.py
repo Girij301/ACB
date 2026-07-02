@@ -1,11 +1,11 @@
+from app.core.database import get_db
 from app.schemas.execute import ExecuteRequest
 from app.services.agent_service import AgentService
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from fastapi import Depends
-from app.core.database import get_db
 
 router = APIRouter()
+
 
 @router.post("/execute")
 def execute(

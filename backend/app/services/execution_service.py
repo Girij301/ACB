@@ -1,23 +1,16 @@
 from pathlib import Path
 
-from sqlalchemy.orm import Session
-
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
 from app.repositories.debug_repository import DebugRepository
 from app.repositories.execution_repository import ExecutionRepository
-from app.repositories.execution_step_repository import (
-    ExecutionStepRepository,
-)
+from app.repositories.execution_step_repository import ExecutionStepRepository
 from app.repositories.retry_repository import RetryRepository
-from app.repositories.validation_repository import (
-    ValidationRepository,
-)
+from app.repositories.validation_repository import ValidationRepository
 from app.schemas.execution import ExecutionResult
 from app.schemas.planner import PlanStep
-from app.services.execution_persistence_service import (
-    ExecutionPersistenceService,
-)
+from app.services.execution_persistence_service import ExecutionPersistenceService
+from sqlalchemy.orm import Session
 
 
 class ExecutionService:

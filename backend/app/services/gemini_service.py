@@ -1,10 +1,9 @@
 import time
 
-from google import genai
-from google.genai.errors import ServerError
-
 from app.core.config import settings
 from app.core.logger import logger
+from google import genai
+from google.genai.errors import ServerError
 
 
 class GeminiService:
@@ -48,15 +47,11 @@ class GeminiService:
                 )
 
                 if retry_number == max_retries:
-                    logger.error(
-                        "Maximum Gemini retry attempts reached."
-                    )
+                    logger.error("Maximum Gemini retry attempts reached.")
                     raise
 
-                wait_time = 2 ** attempt
+                wait_time = 2**attempt
 
-                logger.info(
-                    f"Retrying Gemini request in {wait_time} seconds..."
-                )
+                logger.info(f"Retrying Gemini request in {wait_time} seconds...")
 
                 time.sleep(wait_time)

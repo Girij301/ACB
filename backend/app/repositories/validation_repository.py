@@ -16,11 +16,9 @@ class ValidationRepository:
         validation: ValidationRecord,
     ) -> ValidationRecord:
 
-
         self.db.add(validation)
         self.db.commit()
         self.db.refresh(validation)
-
 
         return validation
 

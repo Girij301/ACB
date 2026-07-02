@@ -1,12 +1,11 @@
 import json
 
-from fastapi import HTTPException
-from google.genai.errors import APIError
-
 from app.core.logger import logger
 from app.prompts.planner_prompt import PLANNER_PROMPT
 from app.schemas.planner import PlannerResponse
 from app.services.gemini_service import GeminiService
+from fastapi import HTTPException
+from google.genai.errors import APIError
 
 
 class PlannerService:
@@ -28,11 +27,7 @@ class PlannerService:
             response = response.strip()
 
             if response.startswith("```"):
-                response = (
-                    response.replace("```json", "")
-                    .replace("```", "")
-                    .strip()
-                )
+                response = response.replace("```json", "").replace("```", "").strip()
 
             logger.info("Raw Gemini response:")
             logger.info(response)

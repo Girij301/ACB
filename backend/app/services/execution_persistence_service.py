@@ -76,9 +76,7 @@ class ExecutionPersistenceService:
             )
 
         execution.status = (
-            ExecutionStatus.SUCCESS.value
-            if success
-            else ExecutionStatus.FAILED.value
+            ExecutionStatus.SUCCESS.value if success else ExecutionStatus.FAILED.value
         )
 
         return self.execution_repository.update(execution)
@@ -112,9 +110,7 @@ class ExecutionPersistenceService:
                 else None
             ),
             error=(
-                result.output.get("error")
-                if isinstance(result.output, dict)
-                else None
+                result.output.get("error") if isinstance(result.output, dict) else None
             ),
             duration_ms=0,
             started_at=now,
@@ -122,7 +118,8 @@ class ExecutionPersistenceService:
         )
 
         return self.execution_step_repository.create(execution_step)
-#tempo
+
+    # tempo
     def record_validation(
         self,
         execution: Execution,
