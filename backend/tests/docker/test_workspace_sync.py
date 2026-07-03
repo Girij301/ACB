@@ -1,3 +1,4 @@
+import shutil
 
 from app.core.config import WORKSPACE_DIR
 from app.execution.context import ExecutionContext
@@ -6,6 +7,22 @@ from app.schemas.planner import ActionType, PlanStep
 
 
 def test_workspace_sync():
+    """
+    Verify that files created on the host workspace
+    are immediately visible inside the Docker container.
+    """
+
+    # ------------------------------------------------------------------
+    # Ensure a clean workspace before running the test
+    # ------------------------------------------------------------------
+    if WORKSPACE_DIR.exists():
+        shutil.rmtree(WORKSPACE_DIR)
+
+    WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
+
+    # ------------------------------------------------------------------
+    # Test plan
+    # ------------------------------------------------------------------
     plan = [
         PlanStep(
             step=1,
@@ -34,6 +51,9 @@ def test_workspace_sync():
         ),
     ]
 
+    # ------------------------------------------------------------------
+    # Execution context
+    # ------------------------------------------------------------------
     context = ExecutionContext(
         session_id="workspace-test",
         plan_id="workspace-test",
@@ -44,6 +64,9 @@ def test_workspace_sync():
 
     result = engine.execute(plan, context)
 
+    # ------------------------------------------------------------------
+    # Assertions
+    # ------------------------------------------------------------------
     assert result.success
     assert result.steps[2].status.value == "success"
     assert "Hello Docker" in result.steps[2].output["stdout"]

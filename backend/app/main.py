@@ -1,3 +1,6 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.chat import router as chat_router
 from app.api.execute import router as execute_router
 from app.api.execution_history import router as execution_history_router
@@ -5,7 +8,6 @@ from app.api.file import router as file_router
 from app.api.planner import router as planner_router
 from app.api.terminal import router as terminal_router
 from app.core.config import settings
-from app.core.database import Base, engine
 from app.core.exceptions import (
     AppException,
     app_exception_handler,
@@ -14,13 +16,8 @@ from app.core.exceptions import (
     generic_exception_handler,
     value_error_handler,
 )
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-# Create all database tables
-Base.metadata.create_all(bind=engine)
-
-# Create FastAPI app using config
+# Create FastAPI app
 app = FastAPI(
     title="ACB AI",
     description="Autonomous AI Agent Backend",
@@ -35,7 +32,7 @@ app.add_exception_handler(FileExistsError, file_exists_handler)
 app.add_exception_handler(ValueError, value_error_handler)
 app.add_exception_handler(Exception, generic_exception_handler)
 
-# CORS configuration
+# CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS.split(","),
