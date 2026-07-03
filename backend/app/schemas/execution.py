@@ -1,5 +1,6 @@
 from enum import Enum
 
+from app.docker.execution_info import ExecutionInfo
 from pydantic import BaseModel
 
 
@@ -20,3 +21,5 @@ class StepResult(BaseModel):
 class ExecutionResult(BaseModel):
     success: bool
     steps: list[StepResult]
+
+    execution_info: ExecutionInfo | None = None

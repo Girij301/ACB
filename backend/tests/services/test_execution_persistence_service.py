@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 from unittest.mock import Mock
 
@@ -58,7 +58,7 @@ def test_complete_execution():
         session_id="session-1",
         plan_id=1,
         status=ExecutionStatus.RUNNING.value,
-        started_at=datetime.now(UTC) - timedelta(seconds=2),
+        started_at=datetime.utcnow() - timedelta(seconds=2),
     )
 
     completed = service.complete_execution(
@@ -100,7 +100,10 @@ def test_record_step():
 
     result = SimpleNamespace(
         status=ExecutionStatus.SUCCESS,
-        error=None,
+        output={
+            "success": True,
+            "message": "Created successfully",
+        },
     )
 
     execution_step = service.record_step(
@@ -120,6 +123,7 @@ def test_record_step():
     assert execution_step.completed_at is not None
     assert execution_step.duration_ms == 0
     assert execution_step.error is None
+    assert execution_step.output is not None
 
 
 def test_record_validation():

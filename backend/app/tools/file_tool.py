@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.core.config import settings
+from app.core.config import WORKSPACE_DIR
 from app.utils.path_utils import get_safe_path
 
 
@@ -13,7 +13,7 @@ class FileTool:
         self,
         workspace: Path | None = None,
     ) -> None:
-        self.workspace = workspace or settings.WORKSPACE_DIR
+        self.workspace = workspace or WORKSPACE_DIR
 
     def create_file(
         self,

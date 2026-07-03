@@ -1,5 +1,8 @@
 from app.core.logger import logger
 from app.debugger.debug_manager import DebugManager
+from app.docker.docker_manager import DockerManager
+from app.docker.execution_container import ExecutionContainer
+from app.docker.sandbox import DEFAULT_SANDBOX
 from app.execution.context import ExecutionContext
 from app.execution.failure_analyzer import FailureAnalyzer
 from app.execution.retry_engine import RetryEngine
@@ -44,170 +47,194 @@ class ExecutionEngine:
 
         memory = ExecutionMemory()
 
-        if self.persistence_service is not None:
-            context.execution = self.persistence_service.create_execution(
-                session_id=context.session_id,
-                plan_id=context.plan_id,
-            )
-
-        for step in plan:
-
-            memory.reset_retry()
-            memory.reset_ai_fix_attempts()
-
-            while True:
-
-                result = self.step_executor.execute(
-                    step=step,
-                    context=context,
-                )
-
-                memory.add_result(result)
-
-                if (
-                    self.persistence_service is not None
-                    and context.execution is not None
-                ):
-                    self.persistence_service.record_step(
-                        execution=context.execution,
-                        step=step,
-                        result=result,
-                    )
-
-                if result.status == ExecutionStatus.SUCCESS:
-                    break
-
-                analysis = self.failure_analyzer.analyze(result)
-
-                logger.info(
-                    "Failure Analysis | "
-                    f"Category={analysis.category.value} | "
-                    f"Retryable={analysis.retryable} | "
-                    f"Reason={analysis.reason}"
-                )
-
-                memory.increment_retry()
-
-                should_retry = self.retry_engine.should_retry(
-                    analysis,
-                    memory.retry_count,
-                )
-
-                if should_retry:
-
-                    if (
-                        self.persistence_service is not None
-                        and context.execution is not None
-                    ):
-                        self.persistence_service.record_retry(
-                            execution=context.execution,
-                            step=step,
-                            retry_attempt=memory.retry_count,
-                            analysis=analysis,
-                            previous_error=getattr(result, "error", None),
-                            success=False,
-                        )
-
-                    logger.info(
-                        f"Retrying step {step.step} "
-                        f"(attempt "
-                        f"{memory.retry_count}/"
-                        f"{self.retry_engine.max_retries})"
-                    )
-
-                    continue
-
-                logger.error(
-                    f"Step {step.step} failed after " f"{memory.retry_count} retries."
-                )
-
-                memory.increment_ai_fix_attempt()
-
-                if memory.ai_fix_attempts > self.retry_engine.max_ai_fix_attempts:
-
-                    logger.error("Maximum AI fix attempts reached.")
-
-                    if (
-                        self.persistence_service is not None
-                        and context.execution is not None
-                    ):
-                        self.persistence_service.complete_execution(
-                            execution=context.execution,
-                            success=False,
-                        )
-
-                    return ExecutionResult(
-                        success=False,
-                        steps=memory.step_results,
-                    )
-
-                logger.info("Requesting AI debugging...")
-
-                debug_result = self.debug_manager.debug(
-                    result=result,
-                    history=[
-                        step_result.model_dump() for step_result in memory.step_results
-                    ],
-                    workspace=context.workspace,
-                )
-
-                if (
-                    self.persistence_service is not None
-                    and context.execution is not None
-                ):
-                    self.persistence_service.record_debug(
-                        execution=context.execution,
-                        step=step,
-                        attempt_number=memory.ai_fix_attempts,
-                        failure_summary=analysis.reason,
-                        ai_summary=(
-                            getattr(debug_result, "summary", None)
-                            if debug_result is not None
-                            else None
-                        ),
-                        success=debug_result is not None,
-                    )
-
-                logger.info("Retrying step after AI patch...")
-
-                memory.reset_retry()
-
-        validation = self.validation_engine.validate(
-            context=context,
-            history=[step_result.model_dump() for step_result in memory.step_results],
+        container = ExecutionContainer(
+            DockerManager(),
+            DEFAULT_SANDBOX.to_container_config(),
         )
 
-        if self.persistence_service is not None and context.execution is not None:
-            for validation_result in validation.results:
-                self.persistence_service.record_validation(
-                    execution=context.execution,
-                    validation_result=validation_result,
+        container.create()
+        container.start()
+
+        context.container = container
+
+        try:
+
+            if self.persistence_service is not None:
+                context.execution = self.persistence_service.create_execution(
+                    session_id=context.session_id,
+                    plan_id=context.plan_id,
                 )
 
-        if not validation.success:
+            for step in plan:
 
-            logger.error("Workspace validation failed.")
+                memory.reset_retry()
+                memory.reset_ai_fix_attempts()
+
+                while True:
+
+                    result = self.step_executor.execute(
+                        step=step,
+                        context=context,
+                    )
+
+                    memory.add_result(result)
+
+                    if (
+                        self.persistence_service is not None
+                        and context.execution is not None
+                    ):
+                        self.persistence_service.record_step(
+                            execution=context.execution,
+                            step=step,
+                            result=result,
+                        )
+
+                    if result.status == ExecutionStatus.SUCCESS:
+                        break
+
+                    analysis = self.failure_analyzer.analyze(result)
+
+                    logger.info(
+                        "Failure Analysis | "
+                        f"Category={analysis.category.value} | "
+                        f"Retryable={analysis.retryable} | "
+                        f"Reason={analysis.reason}"
+                    )
+
+                    memory.increment_retry()
+
+                    should_retry = self.retry_engine.should_retry(
+                        analysis,
+                        memory.retry_count,
+                    )
+
+                    if should_retry:
+
+                        if (
+                            self.persistence_service is not None
+                            and context.execution is not None
+                        ):
+                            self.persistence_service.record_retry(
+                                execution=context.execution,
+                                step=step,
+                                retry_attempt=memory.retry_count,
+                                analysis=analysis,
+                                previous_error=getattr(result, "error", None),
+                                success=False,
+                            )
+
+                        logger.info(
+                            f"Retrying step {step.step} "
+                            f"(attempt "
+                            f"{memory.retry_count}/"
+                            f"{self.retry_engine.max_retries})"
+                        )
+
+                        continue
+
+                    logger.error(
+                        f"Step {step.step} failed after "
+                        f"{memory.retry_count} retries."
+                    )
+
+                    memory.increment_ai_fix_attempt()
+
+                    if memory.ai_fix_attempts > self.retry_engine.max_ai_fix_attempts:
+
+                        logger.error("Maximum AI fix attempts reached.")
+
+                        if (
+                            self.persistence_service is not None
+                            and context.execution is not None
+                        ):
+                            self.persistence_service.complete_execution(
+                                execution=context.execution,
+                                success=False,
+                            )
+
+                        return ExecutionResult(
+                            success=False,
+                            steps=memory.step_results,
+                        )
+
+                    logger.info("Requesting AI debugging...")
+
+                    debug_result = self.debug_manager.debug(
+                        result=result,
+                        history=[
+                            step_result.model_dump()
+                            for step_result in memory.step_results
+                        ],
+                        workspace=context.workspace,
+                    )
+
+                    if (
+                        self.persistence_service is not None
+                        and context.execution is not None
+                    ):
+                        self.persistence_service.record_debug(
+                            execution=context.execution,
+                            step=step,
+                            attempt_number=memory.ai_fix_attempts,
+                            failure_summary=analysis.reason,
+                            ai_summary=(
+                                getattr(debug_result, "summary", None)
+                                if debug_result is not None
+                                else None
+                            ),
+                            success=debug_result is not None,
+                        )
+
+                    logger.info("Retrying step after AI patch...")
+
+                    memory.reset_retry()
+
+            validation = self.validation_engine.validate(
+                context=context,
+                history=[
+                    step_result.model_dump() for step_result in memory.step_results
+                ],
+            )
+
+            if self.persistence_service is not None and context.execution is not None:
+                for validation_result in validation.results:
+                    self.persistence_service.record_validation(
+                        execution=context.execution,
+                        validation_result=validation_result,
+                    )
+
+            if not validation.success:
+
+                logger.error("Workspace validation failed.")
+
+                if (
+                    self.persistence_service is not None
+                    and context.execution is not None
+                ):
+                    self.persistence_service.complete_execution(
+                        execution=context.execution,
+                        success=False,
+                    )
+
+                return ExecutionResult(
+                    success=False,
+                    steps=memory.step_results,
+                )
+
+            logger.info("Workspace validation passed.")
 
             if self.persistence_service is not None and context.execution is not None:
                 self.persistence_service.complete_execution(
                     execution=context.execution,
-                    success=False,
+                    success=True,
                 )
 
             return ExecutionResult(
-                success=False,
+                success=True,
                 steps=memory.step_results,
             )
 
-        logger.info("Workspace validation passed.")
-
-        if self.persistence_service is not None and context.execution is not None:
-            self.persistence_service.complete_execution(
-                execution=context.execution,
-                success=True,
-            )
-
-        return ExecutionResult(
-            success=True,
-            steps=memory.step_results,
-        )
+        finally:
+            if context.container is not None:
+                context.container.close()
+                context.container = None

@@ -93,6 +93,8 @@ class ExecutionPersistenceService:
 
         now = datetime.utcnow()
 
+        output = getattr(result, "output", None)
+
         execution_step = ExecutionStep(
             execution_id=execution.id,
             step_index=step.step,
@@ -104,14 +106,8 @@ class ExecutionPersistenceService:
                 else StepStatus.FAILED.value
             ),
             tool_name=None,
-            output=(
-                json.dumps(result.output, indent=2)
-                if result.output is not None
-                else None
-            ),
-            error=(
-                result.output.get("error") if isinstance(result.output, dict) else None
-            ),
+            output=(json.dumps(output, indent=2) if output is not None else None),
+            error=(output.get("error") if isinstance(output, dict) else None),
             duration_ms=0,
             started_at=now,
             completed_at=now,
@@ -119,7 +115,6 @@ class ExecutionPersistenceService:
 
         return self.execution_step_repository.create(execution_step)
 
-    # tempo
     def record_validation(
         self,
         execution: Execution,
@@ -133,18 +128,24 @@ class ExecutionPersistenceService:
             execution_id=execution.id,
             validator_name=validation_result.validator,
             passed=validation_result.success,
-            stdout=None,
-            stderr=None,
-            duration_ms=0,
+            stdout=getattr(
+                validation_result,
+                "stdout",
+                None,
+            ),
+            stderr=getattr(
+                validation_result,
+                "stderr",
+                None,
+            ),
+            duration_ms=getattr(
+                validation_result,
+                "duration_ms",
+                0,
+            ),
         )
 
-        print("Calling ValidationRepository.create()...")
-
-        saved = self.validation_repository.create(record)
-
-        print("Validation saved successfully. ID =", saved.id)
-
-        return saved
+        return self.validation_repository.create(record)
 
     def record_retry(
         self,

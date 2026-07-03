@@ -9,23 +9,33 @@ WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
 
 
 class Settings(BaseSettings):
-    # AI Configuration
+    """
+    Global application configuration.
+    """
+
+    # AI
     GEMINI_API_KEY: str
     MODEL_NAME: str = "gemini-2.5-flash"
 
-    # Workspace
-    WORKSPACE_DIR: Path = BASE_DIR / "workspace"
+    # Docker
+    DOCKER_ENABLED: bool = True
+    DOCKER_IMAGE: str = "python:3.12-slim"
+    DOCKER_CONTAINER_PREFIX: str = "acb-agent"
+    DOCKER_WORKDIR: str = "/workspace"
+    DOCKER_NETWORK_DISABLED: bool = True
+    DOCKER_AUTO_REMOVE: bool = False
+    DOCKER_MEMORY_LIMIT: str = "512m"
+    DOCKER_NANO_CPUS: int = 1_000_000_000
 
     # Memory
     MEMORY_LIMIT: int = 20
 
-    # Retry Configuration
+    # Retry
     MAX_RETRIES: int = 3
     MAX_AI_FIX_ATTEMPTS: int = 3
 
     # Validation
     ENABLE_VALIDATION: bool = True
-
     DEFAULT_VALIDATORS: tuple[str, ...] = (
         "python -m compileall .",
         "ruff check .",
@@ -35,7 +45,7 @@ class Settings(BaseSettings):
     HOST: str = "0.0.0.0"
     PORT: int = 8000
 
-    # Debugging
+    # Logging
     DEBUG: bool = True
     LOG_LEVEL: str = "INFO"
 
@@ -49,8 +59,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-
-settings.WORKSPACE_DIR.mkdir(
-    parents=True,
-    exist_ok=True,
-)

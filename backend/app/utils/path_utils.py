@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from app.core.config import settings
+from app.core.config import WORKSPACE_DIR
 
 
 def get_safe_path(
@@ -19,7 +19,7 @@ def get_safe_path(
         ValueError: If the resolved path is outside the workspace.
     """
 
-    workspace = (workspace or settings.WORKSPACE_DIR).resolve()
+    workspace = (workspace or WORKSPACE_DIR).resolve()
 
     target = (workspace / relative_path).resolve()
 

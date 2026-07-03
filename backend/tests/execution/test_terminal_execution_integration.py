@@ -34,5 +34,9 @@ def test_run_terminal_command():
         context=context,
     )
 
+    print("STATUS:", result.status)
+    print("MESSAGE:", result.message)
+    print("OUTPUT:", result.output)
     assert result.status == ExecutionStatus.SUCCESS
-    assert result.output["success"] is True
+    assert result.output["exit_code"] == 0
+    assert "Python" in result.output["stdout"]
