@@ -14,7 +14,6 @@ from app.models.message import Message
 from app.models.plan import Plan
 from app.models.retry_record import RetryRecord
 from app.models.validation_record import ValidationRecord
-from app.models.user import User
 
 # Alembic Config object
 config = context.config

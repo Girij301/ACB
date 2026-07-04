@@ -68,7 +68,18 @@ class Settings(BaseSettings):
     # Logging
     # =========================
     DEBUG: bool = True
+
     LOG_LEVEL: str = "INFO"
+
+    LOG_DATE_FORMAT: str = "%Y-%m-%d %H:%M:%S"
+
+    LOG_FORMAT: str = (
+        "%(asctime)s | "
+        "%(levelname)-8s | "
+        "%(name)s | "
+        "%(module)s.%(funcName)s:%(lineno)d | "
+        "%(message)s"
+    )
 
     # =========================
     # CORS

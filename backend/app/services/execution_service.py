@@ -12,6 +12,9 @@ from app.schemas.planner import PlanStep
 from app.services.execution_persistence_service import ExecutionPersistenceService
 from sqlalchemy.orm import Session
 
+from time import perf_counter
+from app.monitoring.execution_metrics import execution_metrics
+
 
 class ExecutionService:
     """
@@ -70,7 +73,23 @@ class ExecutionService:
             plan_id=plan_id,
         )
 
-        return self.engine.execute(
-            plan=plan,
-            context=context,
-        )
+        execution_metrics.execution_started()
+
+        start = perf_counter()
+
+        try:
+            result = self.engine.execute(
+                plan=plan,
+                context=context,
+            )
+
+            return result
+
+        finally:
+            duration = perf_counter() - start
+
+            execution_metrics.execution_finished(
+                success=locals().get("result", None) is not None
+                and result.success,
+                duration=duration,
+            )

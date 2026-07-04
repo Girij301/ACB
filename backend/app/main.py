@@ -17,12 +17,27 @@ from app.core.exceptions import (
     value_error_handler,
 )
 
+from contextlib import asynccontextmanager
+from app.core.logger import logger
+
+from app.api.health import router as health_router
+
+from app.api.metrics import router as metrics_router
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info("Starting ACB AI Backend")
+
+    yield
+
+    logger.info("Shutting down ACB AI Backend")
 # Create FastAPI app
 app = FastAPI(
     title="ACB AI",
     description="Autonomous AI Agent Backend",
     version="1.0.0",
     debug=settings.DEBUG,
+    lifespan=lifespan,
 )
 
 # Exception handlers
@@ -48,19 +63,12 @@ app.include_router(file_router)
 app.include_router(terminal_router)
 app.include_router(execute_router)
 app.include_router(execution_history_router)
-
+app.include_router(health_router)
+app.include_router(metrics_router)
 
 @app.get("/")
 def home():
     return {
         "message": "ACB AI Backend Running",
         "status": "success",
-    }
-
-
-@app.get("/health")
-def health_check():
-    return {
-        "status": "ok",
-        "service": "ACB AI Backend",
     }
