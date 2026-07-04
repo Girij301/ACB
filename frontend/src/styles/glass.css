@@ -1,0 +1,40 @@
+.glass {
+  position: relative;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.03)
+  );
+
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    0 10px 40px rgba(0,0,0,.28);
+
+  border-radius: var(--radius-lg);
+
+  transition:
+    transform .35s ease,
+    border-color .35s ease,
+    box-shadow .35s ease,
+    background .35s ease;
+}
+
+.glass:hover {
+  border-color: rgba(255,255,255,.14);
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    0 18px 60px rgba(0,0,0,.38);
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,.07),
+    rgba(255,255,255,.04)
+  );
+}
