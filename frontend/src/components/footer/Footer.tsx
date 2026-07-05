@@ -19,7 +19,7 @@ export function Footer() {
         "
       >
         <p>
-          © 2026 Kernal Coding Agent. All rights reserved. 
+          © 2026 Coding Agent. All rights reserved. 
         </p>
 
         <div className="flex items-center gap-6">

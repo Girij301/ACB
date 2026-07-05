@@ -5,6 +5,7 @@ from .message import Message
 from .plan import Plan
 from .retry_record import RetryRecord
 from .validation_record import ValidationRecord
+from .user import User
 
 __all__ = [
     "DebugRecord",
@@ -14,4 +15,5 @@ __all__ = [
     "Plan",
     "RetryRecord",
     "ValidationRecord",
+    "User",
 ]

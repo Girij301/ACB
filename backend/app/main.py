@@ -24,6 +24,8 @@ from app.api.health import router as health_router
 
 from app.api.metrics import router as metrics_router
 
+from app.api.me import router as me_router
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     logger.info("Starting ACB AI Backend")
@@ -31,6 +33,8 @@ async def lifespan(app: FastAPI):
     yield
 
     logger.info("Shutting down ACB AI Backend")
+
+import traceback
 # Create FastAPI app
 app = FastAPI(
     title="ACB AI",
@@ -45,7 +49,10 @@ app.add_exception_handler(AppException, app_exception_handler)
 app.add_exception_handler(FileNotFoundError, file_not_found_handler)
 app.add_exception_handler(FileExistsError, file_exists_handler)
 app.add_exception_handler(ValueError, value_error_handler)
-app.add_exception_handler(Exception, generic_exception_handler)
+@app.exception_handler(Exception)
+async def debug_exception_handler(request, exc):
+    traceback.print_exc()
+    raise exc
 
 # CORS
 app.add_middleware(
@@ -65,6 +72,7 @@ app.include_router(execute_router)
 app.include_router(execution_history_router)
 app.include_router(health_router)
 app.include_router(metrics_router)
+app.include_router(me_router)
 
 @app.get("/")
 def home():

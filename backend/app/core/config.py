@@ -17,6 +17,13 @@ class Settings(BaseSettings):
     MODEL_NAME: str = "gemini-2.5-flash"
 
     # =========================
+    # Clerk
+    # =========================
+    CLERK_SECRET_KEY: str
+    CLERK_PUBLISHABLE_KEY: str | None = None
+    CLERK_AUTHORIZED_PARTIES: str = "http://localhost:5173"
+
+    # =========================
     # Database
     # =========================
     DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'chat.db'}"

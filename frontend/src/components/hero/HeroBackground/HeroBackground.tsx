@@ -10,17 +10,9 @@ interface HeroBackgroundProps {
   className?: string;
 }
 
-export function HeroBackground({
-  className,
-}: HeroBackgroundProps) {
+export function HeroBackground({ className }: HeroBackgroundProps) {
   return (
-    <div
-  className={cn(
-    heroBackgroundVariants(),
-    "bottom-[-8rem]",
-    className
-  )}
->
+    <div className={cn(heroBackgroundVariants(), "bottom-[-8rem]", className)}>
       <HeroGrid />
 
       <HeroNoise />
