@@ -1,4 +1,5 @@
 from app.core.logger import logger
+from app.schemas.base import APIResponse
 from app.schemas.planner import PlannerRequest, PlannerResponse
 from app.services.plan_memory import save_plan
 from app.services.planner_service import PlannerService
@@ -9,7 +10,7 @@ router = APIRouter()
 planner_service = PlannerService()
 
 
-@router.post("/planner", response_model=PlannerResponse)
+@router.post("/planner", response_model=APIResponse)
 def create_plan(request: PlannerRequest):
 
     logger.info(f"Planner request | Session={request.session_id}")
@@ -24,4 +25,7 @@ def create_plan(request: PlannerRequest):
 
     logger.info("Planner request completed successfully.")
 
-    return plan
+    return APIResponse(
+        message="Execution plan generated successfully.",
+        data=plan,
+    )

@@ -1,38 +1,29 @@
 import { cva } from "class-variance-authority";
 
 export const cardVariants = cva(
-  [
-    "rounded-3xl",
-    "transition-all",
-    "duration-200",
-  ],
+  ["rounded-3xl", "transition-all", "duration-200"],
   {
     variants: {
       variant: {
-        default: [
-          "bg-white/5",
-          "border",
-          "border-white/10",
-        ],
+        default: ["bg-white/5", "border", "border-white/10"],
 
-        glass: [
-          "liquid-glass",
-          "bg-white/5",
-        ],
+        glass: ["liquid-glass", "bg-white/5"],
 
-        outline: [
-          "border",
-          "border-white/20",
-          "bg-transparent",
-        ],
+        outline: ["border", "border-white/20", "bg-transparent"],
 
         interactive: [
-          "hover:bg-white/[0.08]",
-          "hover:border-white/20",
-          "hover:-translate-y-1",
-          "hover:shadow-2xl",
-          "hover:shadow-cyan-500/5",
           "cursor-pointer",
+
+          "border",
+          "border-white/10",
+
+          "transition-all",
+          "duration-200",
+
+          "hover:bg-white/[0.04]",
+          "hover:border-white/20",
+
+          "hover:shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
         ],
       },
 
@@ -49,5 +40,5 @@ export const cardVariants = cva(
       variant: "default",
       size: "md",
     },
-  }
+  },
 );

@@ -2,7 +2,7 @@ from app.execution.context import ExecutionContext
 from app.schemas.planner import ActionType, PlanStep
 from app.services.docker_terminal_service import DockerTerminalService
 from app.tools.file_tool import FileTool
-
+from app.execution.handlers.write_file_handler import WriteFileHandler
 
 class ToolRegistry:
     """
@@ -20,6 +20,8 @@ class ToolRegistry:
         self.file_tool = FileTool(
             workspace=context.workspace,
         )
+        
+        self.write_file_handler = WriteFileHandler(self.file_tool)
 
         self.terminal_service = terminal_service or DockerTerminalService()
 
@@ -35,7 +37,10 @@ class ToolRegistry:
                 lambda: self.file_tool.create_file(**step.parameters)
             ),
             ActionType.WRITE_FILE: (
-                lambda: self.file_tool.write_file(**step.parameters)
+                lambda: self.write_file_handler.execute(
+                    relative_path=step.parameters["relative_path"],
+                    goal=step.goal,
+                )
             ),
             ActionType.APPEND_FILE: (
                 lambda: self.file_tool.append_file(**step.parameters)

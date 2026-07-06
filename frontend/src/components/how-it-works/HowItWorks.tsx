@@ -1,30 +1,20 @@
-import {
-  BrainCircuit,
-  Code2,
-  Rocket,
-  Wrench,
-} from "lucide-react";
+import { BrainCircuit, Code2, Rocket, Wrench } from "lucide-react";
 
 import { FadeUp } from "@/components/animations";
 import { Heading } from "@/components/ui";
 
-import {
-  howItWorksVariants,
-  timelineVariants,
-} from "./howItWorksVariants";
+import { howItWorksVariants, timelineVariants } from "./howItWorksVariants";
 import { TimelineStep } from "./TimelineStep";
 
 export function HowItWorks() {
   return (
-    <section className={howItWorksVariants()}>
+    <section id="documentation" className={howItWorksVariants()}>
       <div className="max-w-3xl text-center">
-        <Heading level="h2">
-          How It Works
-        </Heading>
+        <Heading level="h2">How It Works</Heading>
 
         <p className="mt-6 text-lg text-white/70">
-          From idea to production, your AI engineer manages the
-          complete software development lifecycle.
+          From idea to production, your AI engineer manages the complete
+          software development lifecycle.
         </p>
       </div>
 

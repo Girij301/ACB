@@ -1,40 +1,156 @@
 .glass {
   position: relative;
+  overflow: hidden;
+  isolation: isolate;
 
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,0.06),
-    rgba(255,255,255,0.03)
-  );
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.12) 0%,
+      rgba(255, 255, 255, 0.06) 45%,
+      rgba(255, 255, 255, 0.03) 100%
+    );
 
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
 
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 10px 40px rgba(0,0,0,.28);
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(255,255,255,.04),
+    0 8px 30px rgba(0,0,0,.18),
+    0 24px 80px rgba(0,0,0,.18);
 
-  border-radius: var(--radius-lg);
+  transition:
+    transform .35s ease,
+    box-shadow .35s ease,
+    background .35s ease,
+    border-color .35s ease,
+    filter .35s ease;
+}
+
+.glass::before {
+  content: "";
+
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255,255,255,.22) 45%,
+      transparent 70%
+    );
+
+  transform: translateX(-150%);
+  transition:
+    transform .8s ease;
+
+  pointer-events: none;
+}
+
+.glass::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 1px;
+
+  border-radius: inherit;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.10),
+      transparent 40%
+    );
+
+  pointer-events: none;
+}
+
+.glass:hover {
+  border-color: rgba(255,255,255,.18);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.14),
+      rgba(255,255,255,.07),
+      rgba(255,255,255,.035)
+    );
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.28),
+    inset 0 -1px 0 rgba(255,255,255,.06),
+    0 10px 35px rgba(0,0,0,.24),
+    0 28px 80px rgba(0,0,0,.18);
+}
+
+.glass:hover::before {
+  transform: translateX(150%);
+}
+
+.glass-hover {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+
+  background: transparent;
+  border: 1px solid transparent;
 
   transition:
     transform .35s ease,
     border-color .35s ease,
     box-shadow .35s ease,
-    background .35s ease;
+    background .35s ease,
+    backdrop-filter .35s ease;
 }
 
-.glass:hover {
-  border-color: rgba(255,255,255,.14);
+.glass-hover:hover {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255,255,255,.12),
+      rgba(255,255,255,.06),
+      rgba(255,255,255,.03)
+    );
+
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+
+  border: 1px solid rgba(255,255,255,.12);
 
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.12),
-    0 18px 60px rgba(0,0,0,.38);
+    inset 0 1px 0 rgba(255,255,255,.22),
+    inset 0 -1px 0 rgba(255,255,255,.04),
+    0 8px 30px rgba(0,0,0,.18),
+    0 24px 80px rgba(0,0,0,.18);
 
-  background: linear-gradient(
-    180deg,
-    rgba(255,255,255,.07),
-    rgba(255,255,255,.04)
-  );
+  transform:
+    translateY(-2px)
+    scale(1.02);
+}
+
+.glass-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 20%,
+      rgba(255,255,255,.22) 45%,
+      transparent 70%
+    );
+
+  transform: translateX(-150%);
+  transition: transform .8s ease;
+  pointer-events: none;
+}
+
+.glass-hover:hover::before {
+  transform: translateX(150%);
 }

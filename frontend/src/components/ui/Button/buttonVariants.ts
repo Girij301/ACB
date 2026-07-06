@@ -9,7 +9,8 @@ export const buttonVariants = cva(
     "rounded-full",
     "font-medium",
     "transition-all",
-    "duration-200",
+    "duration-300",
+    "will-change-transform",
     "disabled:pointer-events-none",
     "disabled:opacity-50",
     "select-none",
@@ -26,6 +27,18 @@ export const buttonVariants = cva(
 
         ghost:
           "bg-transparent text-white hover:bg-white/10",
+
+        ghostGlass:
+          `
+          bg-transparent
+          text-white
+          border
+          border-transparent
+          hover:glass
+          hover:border-white/10
+          hover:-translate-y-0.5
+          hover:scale-[1.02]
+          `,
 
         glass:
           "glass text-white",

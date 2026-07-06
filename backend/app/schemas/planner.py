@@ -4,21 +4,6 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
-class PlannerRequest(BaseModel):
-    session_id: str = Field(
-        ...,
-        min_length=1,
-        description="Unique conversation session ID",
-    )
-
-    task: str = Field(
-        ...,
-        min_length=3,
-        max_length=1000,
-        description="Task to generate an execution plan for",
-    )
-
-
 class ActionType(str, Enum):
     CREATE_DIRECTORY = "create_directory"
     CREATE_FILE = "create_file"
@@ -30,28 +15,22 @@ class ActionType(str, Enum):
     RUN_TERMINAL = "run_terminal"
 
 
+class PlannerRequest(BaseModel):
+    session_id: str = Field(...)
+
+    task: str = Field(...)
+
+
 class PlanStep(BaseModel):
-    step: int = Field(
-        ...,
-        gt=0,
-        description="Sequential step number",
-    )
+    step: int
 
-    action: ActionType = Field(
-        ...,
-        description="Action to be executed by the execution engine",
-    )
+    action: ActionType
 
-    description: str = Field(
-        ...,
-        min_length=1,
-        description="Human-readable description of the step",
-    )
+    description: str
 
-    parameters: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Arguments required for the action",
-    )
+    goal: str | None = None
+
+    parameters: dict[str, Any] = Field(default_factory=dict)
 
 
 class PlannerResponse(BaseModel):

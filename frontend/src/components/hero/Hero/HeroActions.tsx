@@ -1,3 +1,5 @@
+import { useAuth } from "@clerk/clerk-react";
+
 import { cn } from "@/lib";
 
 import { HeroCTA } from "./HeroCTA";
@@ -9,6 +11,8 @@ interface HeroActionsProps {
 export function HeroActions({
   className,
 }: HeroActionsProps) {
+  const { isSignedIn } = useAuth();
+
   return (
     <div
       className={cn(
@@ -16,11 +20,16 @@ export function HeroActions({
         className
       )}
     >
-      <HeroCTA primary>
-        Get Started
+      <HeroCTA
+        primary
+        href={isSignedIn ? "/workspace" : "/sign-in"}
+      >
+        {isSignedIn
+          ? "Open Workspace"
+          : "Get Started"}
       </HeroCTA>
 
-      <HeroCTA>
+      <HeroCTA href="#">
         Documentation
       </HeroCTA>
     </div>

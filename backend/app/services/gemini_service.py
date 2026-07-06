@@ -4,7 +4,7 @@ from app.core.config import settings
 from app.core.logger import logger
 from google import genai
 from google.genai.errors import ServerError
-
+from google.genai.types import GenerateContentConfig
 
 class GeminiService:
     """
@@ -34,10 +34,12 @@ class GeminiService:
                 response = self.client.models.generate_content(
                     model=settings.MODEL_NAME,
                     contents=prompt,
+                    config=GenerateContentConfig(
+                        temperature=0.1,
+                        max_output_tokens=4096,
+                    ),
                 )
-
                 return response.text
-
             except ServerError as exc:
                 retry_number = attempt + 1
 
