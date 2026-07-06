@@ -11,8 +11,13 @@ from app.repositories.execution_repository import ExecutionRepository
 from app.repositories.execution_step_repository import ExecutionStepRepository
 from app.repositories.retry_repository import RetryRepository
 from app.repositories.validation_repository import ValidationRepository
-from app.schemas.execution_status import ExecutionStatus, StepStatus
+from app.schemas.execution import ExecutionStatus as StepExecutionStatus
+from app.schemas.execution_status import (
+    ExecutionStatus,
+    StepStatus,
+)
 
+from app.schemas.execution import ExecutionSummary
 
 class ExecutionPersistenceService:
     """
@@ -38,10 +43,37 @@ class ExecutionPersistenceService:
         self.retry_repository = retry_repository
         self.debug_repository = debug_repository
 
+    def build_execution_summary(
+        self,
+        execution: Execution,
+        workspace: str,
+    ) -> ExecutionSummary:
+        """
+        Convert an Execution model into an API response model.
+        """
+
+        return ExecutionSummary(
+            execution_id=execution.id,
+            session_id=execution.session_id,
+            plan_id=execution.plan_id,
+            status=execution.status,
+            workspace=workspace,
+            total_steps=execution.total_steps,
+            successful_steps=execution.successful_steps,
+            failed_steps=execution.failed_steps,
+            retry_count=execution.retry_count,
+            debug_count=execution.debug_count,
+            validation_count=execution.validation_count,
+            duration_ms=execution.duration_ms,
+            started_at=execution.started_at,
+            completed_at=execution.completed_at,
+        )
+    
     def create_execution(
         self,
         session_id: str,
         plan_id: int,
+        total_steps: int,
     ) -> Execution:
         """
         Create a new execution record when an execution starts.
@@ -52,6 +84,7 @@ class ExecutionPersistenceService:
             plan_id=plan_id,
             status=ExecutionStatus.RUNNING.value,
             started_at=datetime.utcnow(),
+            total_steps=total_steps,
         )
 
         return self.execution_repository.create(execution)
@@ -76,7 +109,9 @@ class ExecutionPersistenceService:
             )
 
         execution.status = (
-            ExecutionStatus.SUCCESS.value if success else ExecutionStatus.FAILED.value
+            ExecutionStatus.SUCCESS.value
+            if success
+            else ExecutionStatus.FAILED.value
         )
 
         return self.execution_repository.update(execution)
@@ -91,6 +126,13 @@ class ExecutionPersistenceService:
         Persist a single execution step.
         """
 
+        if result.status == StepExecutionStatus.SUCCESS:
+            execution.successful_steps += 1
+        else:
+            execution.failed_steps += 1
+
+        self.execution_repository.update(execution)
+
         now = datetime.utcnow()
 
         output = getattr(result, "output", None)
@@ -102,12 +144,20 @@ class ExecutionPersistenceService:
             description=step.description,
             status=(
                 StepStatus.SUCCESS.value
-                if result.status == ExecutionStatus.SUCCESS
+                if result.status == StepExecutionStatus.SUCCESS
                 else StepStatus.FAILED.value
             ),
             tool_name=None,
-            output=(json.dumps(output, indent=2) if output is not None else None),
-            error=(output.get("error") if isinstance(output, dict) else None),
+            output=(
+                json.dumps(output, indent=2)
+                if output is not None
+                else None
+            ),
+            error=(
+                output.get("error")
+                if isinstance(output, dict)
+                else None
+            ),
             duration_ms=0,
             started_at=now,
             completed_at=now,
@@ -123,6 +173,9 @@ class ExecutionPersistenceService:
         """
         Persist a validation result.
         """
+
+        execution.validation_count += 1
+        self.execution_repository.update(execution)
 
         record = ValidationRecord(
             execution_id=execution.id,
@@ -160,6 +213,9 @@ class ExecutionPersistenceService:
         Persist a retry attempt.
         """
 
+        execution.retry_count += 1
+        self.execution_repository.update(execution)
+
         retry_record = RetryRecord(
             execution_id=execution.id,
             step_index=step.step,
@@ -183,6 +239,9 @@ class ExecutionPersistenceService:
         """
         Persist an AI debugging attempt.
         """
+
+        execution.debug_count += 1
+        self.execution_repository.update(execution)
 
         debug_record = DebugRecord(
             execution_id=execution.id,

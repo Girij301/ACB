@@ -3,11 +3,17 @@ import type { PlanStep } from "@/services/planner";
 interface PlannerPanelProps {
   plan: PlanStep[];
   loading: boolean;
+
+  executing: boolean;
+
+  onExecute: () => void | Promise<void>;
 }
 
 export function PlannerPanel({
   plan,
   loading,
+  executing,
+  onExecute,
 }: PlannerPanelProps) {
   return (
     <section className="glass flex h-full flex-col rounded-2xl p-5">
@@ -16,11 +22,35 @@ export function PlannerPanel({
           Planner
         </h2>
 
-        {loading && (
-          <span className="text-xs text-cyan-300">
-            Planning...
-          </span>
-        )}
+        <div className="flex items-center gap-3">
+          {loading && (
+            <span className="text-xs text-cyan-300">
+              Planning...
+            </span>
+          )}
+
+          {plan.length > 0 && (
+            <button
+              onClick={onExecute}
+              disabled={executing}
+              className="
+                rounded-lg
+                bg-cyan-500
+                px-4
+                py-2
+                text-sm
+                font-medium
+                text-white
+                transition-colors
+                hover:bg-cyan-400
+                disabled:cursor-not-allowed
+                disabled:opacity-50
+              "
+            >
+              {executing ? "Executing..." : "Execute"}
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto rounded-xl border border-white/5 bg-black/20 p-4">

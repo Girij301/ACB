@@ -16,9 +16,27 @@ export interface StepResult {
   output?: Record<string, unknown> | null;
 }
 
-export interface ExecutionInfo {
-  container_id?: string;
-  workspace?: string;
+export interface ExecutionSummary {
+  execution_id: number;
+  session_id: string;
+  plan_id: number;
+
+  status: string;
+
+  workspace: string;
+
+  total_steps: number;
+  successful_steps: number;
+  failed_steps: number;
+
+  retry_count: number;
+  debug_count: number;
+  validation_count: number;
+
+  duration_ms: number;
+
+  started_at: string;
+  completed_at: string;
 }
 
 export interface ExecutionResponse {
@@ -26,5 +44,5 @@ export interface ExecutionResponse {
 
   steps: StepResult[];
 
-  execution_info?: ExecutionInfo | null;
+  execution: ExecutionSummary;
 }

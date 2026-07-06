@@ -35,6 +35,32 @@ class ExecutionEngine:
         self.validation_engine = validation_engine or ValidationEngine()
         self.persistence_service = persistence_service
 
+    def _build_result(
+        self,
+        *,
+        success: bool,
+        memory: ExecutionMemory,
+        context: ExecutionContext,
+    ) -> ExecutionResult:
+        execution_summary = None
+
+        if (
+            self.persistence_service is not None
+            and context.execution is not None
+        ):
+            execution_summary = (
+                self.persistence_service.build_execution_summary(
+                    execution=context.execution,
+                    workspace=str(context.workspace),
+                )
+            )
+
+        return ExecutionResult(
+            success=success,
+            steps=memory.step_results,
+            execution=execution_summary,
+        )
+    
     def execute(
         self,
         plan: list[PlanStep],
@@ -63,6 +89,7 @@ class ExecutionEngine:
                 context.execution = self.persistence_service.create_execution(
                     session_id=context.session_id,
                     plan_id=context.plan_id,
+                    total_steps=len(plan),
                 )
 
             for step in plan:
@@ -152,9 +179,10 @@ class ExecutionEngine:
                                 success=False,
                             )
 
-                        return ExecutionResult(
+                        return self._build_result(
                             success=False,
-                            steps=memory.step_results,
+                            memory=memory,
+                            context=context,
                         )
 
                     logger.info("Requesting AI debugging...")
@@ -216,9 +244,10 @@ class ExecutionEngine:
                         success=False,
                     )
 
-                return ExecutionResult(
+                return self._build_result(
                     success=False,
-                    steps=memory.step_results,
+                    memory=memory,
+                    context=context,
                 )
 
             logger.info("Workspace validation passed.")
@@ -229,9 +258,10 @@ class ExecutionEngine:
                     success=True,
                 )
 
-            return ExecutionResult(
+            return self._build_result(
                 success=True,
-                steps=memory.step_results,
+                memory=memory,
+                context=context,
             )
 
         finally:
