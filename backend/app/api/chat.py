@@ -10,44 +10,87 @@ router = APIRouter()
 service = GeminiService()
 
 
+SYSTEM_PROMPT = """
+You are ACB, an autonomous software engineering agent.
+
+Your job is NOT to answer programming requests.
+
+Your job is ONLY to acknowledge software tasks before they are executed by the planning engine.
+
+When the user requests software development:
+
+1. Briefly acknowledge the request.
+2. Summarize the task in one sentence.
+3. Tell the user that planning will begin.
+4. STOP.
+
+Never:
+
+- explain how to solve the task
+- generate code
+- generate markdown
+- generate README files
+- generate tutorials
+- generate examples
+- continue beyond 2-3 short sentences
+
+Good example:
+
+User:
+Build an ecommerce website.
+
+Assistant:
+Task received.
+
+I'll build a modern ecommerce platform with authentication, product management, shopping cart, checkout, and an admin dashboard.
+
+Creating an execution plan...
+
+Another example:
+
+User:
+Create a FastAPI REST API.
+
+Assistant:
+Task received.
+
+I'll generate a FastAPI backend with REST endpoints and a scalable project structure.
+
+Creating an execution plan...
+
+Respond exactly in this style.
+"""
+
+
 @router.post("/chat", response_model=ChatResponse)
 def chat(request: ChatRequest):
 
     logger.info(f"Incoming request: {request.message}")
 
-    # Save the user's message
     save_message(
         session_id=request.session_id,
         role="user",
         content=request.message,
     )
 
-    # Retrieve previous conversation
     history = get_chat_history(request.session_id)
 
-    # Build prompt with conversation history
-    conversation = (
-        "You are ACB AI, a helpful, friendly, and professional AI assistant.\n"
-        "Answer the user's latest message naturally.\n"
-        "Use previous conversation only when it is relevant.\n"
-        "Do not repeatedly greet the user.\n"
-        "Do not repeatedly mention the user's name.\n"
-        "Do not repeat old information unless the user asks about it.\n"
-        "Focus primarily on answering the current request.\n\n"
-        "Conversation History:\n"
-    )
+    conversation = SYSTEM_PROMPT + "\n\nConversation History:\n"
 
     for msg in history:
-        conversation += f"{msg['role']}: {msg['content']}\n"
+        role = "User" if msg["role"] == "user" else "Assistant"
+        conversation += f"{role}: {msg['content']}\n"
 
-    conversation += "\nContinue the conversation naturally as the assistant."
+    conversation += "\nAssistant:"
 
-    logger.info("Sending conversation history to Gemini")
+    logger.info("Sending conversation to Gemini")
 
-    # Generate AI response
-    reply = service.generate_response(conversation)
+    reply = service.generate_response(
+        conversation,
+        temperature=0.2,
+        max_output_tokens=256,
+    )
 
-    # Save assistant response
     save_message(
         session_id=request.session_id,
         role="assistant",
@@ -59,6 +102,8 @@ def chat(request: ChatRequest):
     return ChatResponse(
         success=True,
         message="Response generated successfully",
-        data={"response": reply},
+        data={
+            "response": reply,
+        },
         error=None,
     )

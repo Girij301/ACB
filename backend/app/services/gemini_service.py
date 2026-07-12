@@ -6,6 +6,7 @@ from google import genai
 from google.genai.errors import ServerError
 from google.genai.types import GenerateContentConfig
 
+
 class GeminiService:
     """
     Wrapper around the Gemini API.
@@ -19,7 +20,13 @@ class GeminiService:
             api_key=settings.GEMINI_API_KEY,
         )
 
-    def generate_response(self, prompt: str) -> str:
+    def generate_response(
+        self,
+        prompt: str,
+        *,
+        temperature: float = 0.1,
+        max_output_tokens: int = 4096,
+    ) -> str:
         """
         Generate a response from Gemini.
 
@@ -35,11 +42,13 @@ class GeminiService:
                     model=settings.MODEL_NAME,
                     contents=prompt,
                     config=GenerateContentConfig(
-                        temperature=0.1,
-                        max_output_tokens=4096,
+                        temperature=temperature,
+                        max_output_tokens=max_output_tokens,
                     ),
                 )
-                return response.text
+
+                return response.text.strip()
+
             except ServerError as exc:
                 retry_number = attempt + 1
 
@@ -54,6 +63,8 @@ class GeminiService:
 
                 wait_time = 2**attempt
 
-                logger.info(f"Retrying Gemini request in {wait_time} seconds...")
+                logger.info(
+                    f"Retrying Gemini request in {wait_time} seconds..."
+                )
 
                 time.sleep(wait_time)

@@ -12,6 +12,7 @@ from app.schemas.execution import ExecutionResult, ExecutionStatus
 from app.schemas.execution_memory import ExecutionMemory
 from app.schemas.planner import PlanStep
 from app.services.execution_persistence_service import ExecutionPersistenceService
+from app.execution.events.event_service import EventService
 
 
 class ExecutionEngine:
@@ -27,6 +28,7 @@ class ExecutionEngine:
         debug_manager: DebugManager | None = None,
         validation_engine: ValidationEngine | None = None,
         persistence_service: ExecutionPersistenceService | None = None,
+        event_service: EventService | None = None,
     ) -> None:
         self.step_executor = step_executor or StepExecutor()
         self.retry_engine = retry_engine or RetryEngine()
@@ -34,6 +36,7 @@ class ExecutionEngine:
         self.debug_manager = debug_manager or DebugManager()
         self.validation_engine = validation_engine or ValidationEngine()
         self.persistence_service = persistence_service
+        self.events = event_service or EventService()
 
     def _build_result(
         self,
@@ -73,6 +76,8 @@ class ExecutionEngine:
 
         memory = ExecutionMemory()
 
+        finished_event_sent = False
+        
         container = ExecutionContainer(
             DockerManager(),
             DEFAULT_SANDBOX.to_container_config(),
@@ -91,6 +96,10 @@ class ExecutionEngine:
                     plan_id=context.plan_id,
                     total_steps=len(plan),
                 )
+            self.events.execution_started(
+                context=context,
+                total_steps=len(plan),
+            )
 
             for step in plan:
 
@@ -98,6 +107,11 @@ class ExecutionEngine:
                 memory.reset_ai_fix_attempts()
 
                 while True:
+                    
+                    self.events.step_started(
+                        context=context,
+                        step=step,
+                    )
 
                     result = self.step_executor.execute(
                         step=step,
@@ -115,6 +129,12 @@ class ExecutionEngine:
                             step=step,
                             result=result,
                         )
+
+                    self.events.step_completed(
+                        context=context,
+                        step=step,
+                        result=result,
+                    )
 
                     if result.status == ExecutionStatus.SUCCESS:
                         break
@@ -156,7 +176,21 @@ class ExecutionEngine:
                             f"{memory.retry_count}/"
                             f"{self.retry_engine.max_retries})"
                         )
+                        
+                        self.events.retry_started(
+                            context=context,
+                            step=step,
+                            retry_count=memory.retry_count,
+                            reason=analysis.reason,
+                        )
 
+                        self.events.retry_completed(
+                            context=context,
+                            step=step,
+                            retry_count=memory.retry_count,
+                            success=False,  
+                        )
+                        
                         continue
 
                     logger.error(
@@ -178,7 +212,11 @@ class ExecutionEngine:
                                 execution=context.execution,
                                 success=False,
                             )
-
+                        self.events.execution_finished(
+                            context=context,
+                            success=False,
+                        )
+                        finished_event_sent = True
                         return self._build_result(
                             success=False,
                             memory=memory,
@@ -186,6 +224,12 @@ class ExecutionEngine:
                         )
 
                     logger.info("Requesting AI debugging...")
+                    
+                    self.events.debug_started(
+                        context=context,
+                        step=step,
+                        attempt=memory.ai_fix_attempts,
+                    )
 
                     debug_result = self.debug_manager.debug(
                         result=result,
@@ -212,10 +256,21 @@ class ExecutionEngine:
                             ),
                             success=debug_result is not None,
                         )
+                        
+                    self.events.debug_completed(
+                        context=context,
+                        step=step,
+                        attempt=memory.ai_fix_attempts,
+                        success=debug_result is not None,
+                    )
 
                     logger.info("Retrying step after AI patch...")
 
                     memory.reset_retry()
+                    
+            self.events.validation_started(
+                context=context,
+            )
 
             validation = self.validation_engine.validate(
                 context=context,
@@ -230,6 +285,11 @@ class ExecutionEngine:
                         execution=context.execution,
                         validation_result=validation_result,
                     )
+                    
+            self.events.validation_completed(
+                context=context,
+                success=validation.success,
+            )
 
             if not validation.success:
 
@@ -243,7 +303,13 @@ class ExecutionEngine:
                         execution=context.execution,
                         success=False,
                     )
-
+                
+                self.events.execution_finished(
+                    context=context,
+                    success=False,
+                )
+                finished_event_sent = True
+                
                 return self._build_result(
                     success=False,
                     memory=memory,
@@ -257,14 +323,29 @@ class ExecutionEngine:
                     execution=context.execution,
                     success=True,
                 )
-
+            self.events.execution_finished(
+                context=context,
+                success=True,
+            )
+            finished_event_sent = True
             return self._build_result(
                 success=True,
                 memory=memory,
                 context=context,
             )
 
+        except Exception:
+
+            if not finished_event_sent:
+                self.events.execution_finished(
+                    context=context,
+                    success=False,
+                )
+
+            raise
+
         finally:
             if context.container is not None:
                 context.container.close()
                 context.container = None
+        

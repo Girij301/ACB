@@ -11,9 +11,11 @@ class WriteFileHandler:
         self,
         relative_path: str,
         goal: str,
+        step_description: str,
     ):
         code = self.generator.generate(
             goal=goal,
+            step_description=step_description,
             relative_path=relative_path,
         )
 
