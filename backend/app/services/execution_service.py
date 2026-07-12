@@ -1,7 +1,9 @@
 from pathlib import Path
+from time import perf_counter
 
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
+from app.monitoring.execution_metrics import execution_metrics
 from app.repositories.debug_repository import DebugRepository
 from app.repositories.execution_repository import ExecutionRepository
 from app.repositories.execution_step_repository import ExecutionStepRepository
@@ -11,9 +13,6 @@ from app.schemas.execution import ExecutionResult
 from app.schemas.planner import PlanStep
 from app.services.execution_persistence_service import ExecutionPersistenceService
 from sqlalchemy.orm import Session
-
-from time import perf_counter
-from app.monitoring.execution_metrics import execution_metrics
 
 
 class ExecutionService:
@@ -89,7 +88,6 @@ class ExecutionService:
             duration = perf_counter() - start
 
             execution_metrics.execution_finished(
-                success=locals().get("result", None) is not None
-                and result.success,
+                success=locals().get("result", None) is not None and result.success,
                 duration=duration,
             )

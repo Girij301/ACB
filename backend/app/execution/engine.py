@@ -4,6 +4,7 @@ from app.docker.docker_manager import DockerManager
 from app.docker.execution_container import ExecutionContainer
 from app.docker.sandbox import DEFAULT_SANDBOX
 from app.execution.context import ExecutionContext
+from app.execution.events.event_service import EventService
 from app.execution.failure_analyzer import FailureAnalyzer
 from app.execution.retry_engine import RetryEngine
 from app.execution.step_executor import StepExecutor
@@ -12,7 +13,6 @@ from app.schemas.execution import ExecutionResult, ExecutionStatus
 from app.schemas.execution_memory import ExecutionMemory
 from app.schemas.planner import PlanStep
 from app.services.execution_persistence_service import ExecutionPersistenceService
-from app.execution.events.event_service import EventService
 
 
 class ExecutionEngine:
@@ -47,15 +47,10 @@ class ExecutionEngine:
     ) -> ExecutionResult:
         execution_summary = None
 
-        if (
-            self.persistence_service is not None
-            and context.execution is not None
-        ):
-            execution_summary = (
-                self.persistence_service.build_execution_summary(
-                    execution=context.execution,
-                    workspace=str(context.workspace),
-                )
+        if self.persistence_service is not None and context.execution is not None:
+            execution_summary = self.persistence_service.build_execution_summary(
+                execution=context.execution,
+                workspace=str(context.workspace),
             )
 
         return ExecutionResult(
@@ -63,7 +58,7 @@ class ExecutionEngine:
             steps=memory.step_results,
             execution=execution_summary,
         )
-    
+
     def execute(
         self,
         plan: list[PlanStep],
@@ -77,7 +72,7 @@ class ExecutionEngine:
         memory = ExecutionMemory()
 
         finished_event_sent = False
-        
+
         container = ExecutionContainer(
             DockerManager(),
             DEFAULT_SANDBOX.to_container_config(),
@@ -107,7 +102,7 @@ class ExecutionEngine:
                 memory.reset_ai_fix_attempts()
 
                 while True:
-                    
+
                     self.events.step_started(
                         context=context,
                         step=step,
@@ -176,7 +171,7 @@ class ExecutionEngine:
                             f"{memory.retry_count}/"
                             f"{self.retry_engine.max_retries})"
                         )
-                        
+
                         self.events.retry_started(
                             context=context,
                             step=step,
@@ -188,9 +183,9 @@ class ExecutionEngine:
                             context=context,
                             step=step,
                             retry_count=memory.retry_count,
-                            success=False,  
+                            success=False,
                         )
-                        
+
                         continue
 
                     logger.error(
@@ -224,7 +219,7 @@ class ExecutionEngine:
                         )
 
                     logger.info("Requesting AI debugging...")
-                    
+
                     self.events.debug_started(
                         context=context,
                         step=step,
@@ -256,7 +251,7 @@ class ExecutionEngine:
                             ),
                             success=debug_result is not None,
                         )
-                        
+
                     self.events.debug_completed(
                         context=context,
                         step=step,
@@ -267,7 +262,7 @@ class ExecutionEngine:
                     logger.info("Retrying step after AI patch...")
 
                     memory.reset_retry()
-                    
+
             self.events.validation_started(
                 context=context,
             )
@@ -285,7 +280,7 @@ class ExecutionEngine:
                         execution=context.execution,
                         validation_result=validation_result,
                     )
-                    
+
             self.events.validation_completed(
                 context=context,
                 success=validation.success,
@@ -303,13 +298,13 @@ class ExecutionEngine:
                         execution=context.execution,
                         success=False,
                     )
-                
+
                 self.events.execution_finished(
                     context=context,
                     success=False,
                 )
                 finished_event_sent = True
-                
+
                 return self._build_result(
                     success=False,
                     memory=memory,
@@ -348,4 +343,3 @@ class ExecutionEngine:
             if context.container is not None:
                 context.container.close()
                 context.container = None
-        

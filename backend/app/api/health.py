@@ -1,13 +1,12 @@
 from datetime import datetime
 from time import perf_counter
 
-from fastapi import APIRouter, HTTPException
-from sqlalchemy import text
-
 from app.core.database import SessionLocal, db_dialect
 from app.core.logger import logger
 from app.docker.docker_manager import DockerManager
 from app.schemas.base import APIResponse
+from fastapi import APIRouter, HTTPException
+from sqlalchemy import text
 
 router = APIRouter(tags=["Monitoring"])
 
@@ -65,11 +64,7 @@ def health_check():
     # Overall Status
     # --------------------------------------------------
 
-    overall_status = (
-        "healthy"
-        if database_status == "healthy"
-        else "unhealthy"
-    )
+    overall_status = "healthy" if database_status == "healthy" else "unhealthy"
 
     payload = {
         "status": overall_status,

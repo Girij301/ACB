@@ -27,9 +27,7 @@ class EventService:
                 type=ExecutionEventType.EXECUTION_STARTED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 message="Execution started.",
                 payload={
@@ -49,9 +47,7 @@ class EventService:
                 type=ExecutionEventType.EXECUTION_FINISHED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 message="Execution completed.",
                 payload={
@@ -71,9 +67,7 @@ class EventService:
                 type=ExecutionEventType.STEP_STARTED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message=step.description,
@@ -96,9 +90,7 @@ class EventService:
                 type=ExecutionEventType.STEP_COMPLETED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message=result.message,
@@ -122,9 +114,7 @@ class EventService:
                 type=ExecutionEventType.RETRY_STARTED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message="Retrying step.",
@@ -147,9 +137,7 @@ class EventService:
                 type=ExecutionEventType.DEBUG_STARTED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message="AI debugging started.",
@@ -169,9 +157,7 @@ class EventService:
                 type=ExecutionEventType.VALIDATION_STARTED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 message="Validation started.",
             )
@@ -188,9 +174,7 @@ class EventService:
                 type=ExecutionEventType.VALIDATION_COMPLETED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 message="Validation completed.",
                 payload={
@@ -198,7 +182,7 @@ class EventService:
                 },
             )
         )
-        
+
     def retry_completed(
         self,
         *,
@@ -212,9 +196,7 @@ class EventService:
                 type=ExecutionEventType.RETRY_COMPLETED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message="Retry completed.",
@@ -224,7 +206,7 @@ class EventService:
                 },
             )
         )
-        
+
     def debug_completed(
         self,
         *,
@@ -238,9 +220,7 @@ class EventService:
                 type=ExecutionEventType.DEBUG_COMPLETED,
                 session_id=context.session_id,
                 execution_id=(
-                    context.execution.id
-                    if context.execution is not None
-                    else None
+                    context.execution.id if context.execution is not None else None
                 ),
                 step_number=step.step,
                 message="AI debugging completed.",

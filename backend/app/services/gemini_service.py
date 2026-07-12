@@ -63,8 +63,6 @@ class GeminiService:
 
                 wait_time = 2**attempt
 
-                logger.info(
-                    f"Retrying Gemini request in {wait_time} seconds..."
-                )
+                logger.info(f"Retrying Gemini request in {wait_time} seconds...")
 
                 time.sleep(wait_time)

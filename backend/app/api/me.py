@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends
-
 from app.auth import get_current_user
 from app.models.user import User
+from fastapi import APIRouter, Depends
 
 router = APIRouter(
     prefix="/me",

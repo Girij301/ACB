@@ -19,4 +19,3 @@ class Message(Base):
         DateTime,
         default=lambda: datetime.now(UTC),
     )
-

@@ -4,6 +4,7 @@ import time
 from time import perf_counter
 from typing import Optional
 
+import docker
 from app.core.logger import logger
 from app.docker.container_logs import ContainerLogs
 from app.docker.exceptions import (
@@ -23,8 +24,6 @@ from docker.client import DockerClient
 from docker.errors import APIError, DockerException, ImageNotFound, NotFound
 from docker.models.containers import Container
 from docker.models.images import Image
-
-import docker
 
 
 class DockerManager:

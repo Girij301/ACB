@@ -1,13 +1,8 @@
-#verify req.
-from fastapi import HTTPException, Request, status
-
-from clerk_backend_api import Clerk
-from clerk_backend_api.security import (
-    AuthenticateRequestOptions,
-    AuthStatus,
-)
-
+# verify req.
 from app.core.config import settings
+from clerk_backend_api import Clerk
+from clerk_backend_api.security import AuthenticateRequestOptions, AuthStatus
+from fastapi import HTTPException, Request, status
 
 clerk = Clerk(
     bearer_auth=settings.CLERK_SECRET_KEY,

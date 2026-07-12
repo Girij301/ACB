@@ -1,8 +1,7 @@
 from collections import defaultdict
 
-from fastapi import WebSocket
-
 from app.core.logger import logger
+from fastapi import WebSocket
 
 
 class ConnectionManager:
@@ -53,9 +52,7 @@ class ConnectionManager:
             try:
                 await websocket.send_json(message)
             except Exception:
-                logger.exception(
-                    "Failed to send WebSocket message."
-                )
+                logger.exception("Failed to send WebSocket message.")
                 self.disconnect(session_id, websocket)
 
 

@@ -3,9 +3,7 @@ import asyncio
 from app.core import event_loop as loop_holder
 from app.core.logger import logger
 from app.execution.events.execution_event import ExecutionEvent
-from app.execution.events.execution_event_subscriber import (
-    ExecutionEventSubscriber,
-)
+from app.execution.events.execution_event_subscriber import ExecutionEventSubscriber
 from app.websocket.connection_manager import connection_manager
 
 
@@ -28,6 +26,4 @@ class WebSocketSubscriber(ExecutionEventSubscriber):
         try:
             future.result(timeout=5)
         except Exception:
-            logger.exception(
-                "Failed to send execution event via WebSocket."
-            )
+            logger.exception("Failed to send execution event via WebSocket.")

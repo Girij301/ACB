@@ -1,9 +1,8 @@
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
-
 from app.execution.events.event_types import ExecutionEventType
+from pydantic import BaseModel, Field
 
 
 class ExecutionEvent(BaseModel):

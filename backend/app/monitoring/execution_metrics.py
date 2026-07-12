@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
 from threading import Lock
+
+from pydantic import BaseModel
 
 
 class ExecutionMetricsSnapshot(BaseModel):
@@ -69,23 +70,11 @@ class ExecutionMetrics:
 
         with self._lock:
 
-            average = (
-                self._total_time / self._total
-                if self._total
-                else 0.0
-            )
+            average = self._total_time / self._total if self._total else 0.0
 
-            success_rate = (
-                (self._success / self._total) * 100
-                if self._total
-                else 0.0
-            )
+            success_rate = (self._success / self._total) * 100 if self._total else 0.0
 
-            failure_rate = (
-                (self._failed / self._total) * 100
-                if self._total
-                else 0.0
-            )
+            failure_rate = (self._failed / self._total) * 100 if self._total else 0.0
 
             return ExecutionMetricsSnapshot(
                 total_executions=self._total,

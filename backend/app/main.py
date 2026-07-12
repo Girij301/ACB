@@ -2,9 +2,6 @@ import asyncio
 import traceback
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
 from app.api.chat import router as chat_router
 from app.api.execute import router as execute_router
 from app.api.execution_history import router as execution_history_router
@@ -15,9 +12,8 @@ from app.api.metrics import router as metrics_router
 from app.api.planner import router as planner_router
 from app.api.terminal import router as terminal_router
 from app.api.websocket import router as websocket_router
-
 from app.core import event_loop as event_loop_module
-
+from app.core import event_loop as loop_holder
 from app.core.config import settings
 from app.core.exceptions import (
     AppException,
@@ -27,16 +23,12 @@ from app.core.exceptions import (
     value_error_handler,
 )
 from app.core.logger import logger
-
 from app.execution.events.global_publisher import execution_event_publisher
-from app.execution.events.subscribers.logging_subscriber import (
-    LoggingSubscriber,
-)
-from app.execution.events.subscribers.websocket_subscriber import (
-    WebSocketSubscriber,
-)
+from app.execution.events.subscribers.logging_subscriber import LoggingSubscriber
+from app.execution.events.subscribers.websocket_subscriber import WebSocketSubscriber
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.core import event_loop as loop_holder
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

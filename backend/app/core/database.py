@@ -1,7 +1,8 @@
-from app.core.config import settings, BASE_DIR
+from urllib.parse import urlparse
+
+from app.core.config import BASE_DIR, settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from urllib.parse import urlparse
 
 # ---------------------------------------------------------------------
 # DATABASE URL (CONFIG DRIVEN WITH SAFE FALLBACK)
@@ -59,6 +60,7 @@ Base = declarative_base()
 # ---------------------------------------------------------------------
 # DB DEPENDENCY
 # ---------------------------------------------------------------------
+
 
 def get_db():
     db = SessionLocal()

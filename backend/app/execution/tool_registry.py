@@ -1,8 +1,9 @@
 from app.execution.context import ExecutionContext
+from app.execution.handlers.write_file_handler import WriteFileHandler
 from app.schemas.planner import ActionType, PlanStep
 from app.services.docker_terminal_service import DockerTerminalService
 from app.tools.file_tool import FileTool
-from app.execution.handlers.write_file_handler import WriteFileHandler
+
 
 class ToolRegistry:
     """
@@ -20,7 +21,7 @@ class ToolRegistry:
         self.file_tool = FileTool(
             workspace=context.workspace,
         )
-        
+
         self.write_file_handler = WriteFileHandler(self.file_tool)
 
         self.terminal_service = terminal_service or DockerTerminalService()

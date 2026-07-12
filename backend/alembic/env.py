@@ -1,19 +1,11 @@
 from logging.config import fileConfig
 
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
 from app.core.config import settings
 from app.core.database import Base
 
 # Import all SQLAlchemy models so they are registered with Base.metadata
-from app.models.debug_record import DebugRecord
-from app.models.execution import Execution
-from app.models.execution_step import ExecutionStep
-from app.models.message import Message
-from app.models.plan import Plan
-from app.models.retry_record import RetryRecord
-from app.models.validation_record import ValidationRecord
+from sqlalchemy import engine_from_config, pool
 
 # Alembic Config object
 config = context.config

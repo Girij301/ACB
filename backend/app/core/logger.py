@@ -3,7 +3,6 @@ import sys
 
 from app.core.config import settings
 
-
 LOG_FORMAT = (
     "%(asctime)s | "
     "%(levelname)-8s | "

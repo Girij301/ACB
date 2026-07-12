@@ -4,8 +4,8 @@ from .execution_step import ExecutionStep
 from .message import Message
 from .plan import Plan
 from .retry_record import RetryRecord
-from .validation_record import ValidationRecord
 from .user import User
+from .validation_record import ValidationRecord
 
 __all__ = [
     "DebugRecord",

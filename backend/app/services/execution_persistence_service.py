@@ -12,12 +12,9 @@ from app.repositories.execution_step_repository import ExecutionStepRepository
 from app.repositories.retry_repository import RetryRepository
 from app.repositories.validation_repository import ValidationRepository
 from app.schemas.execution import ExecutionStatus as StepExecutionStatus
-from app.schemas.execution_status import (
-    ExecutionStatus,
-    StepStatus,
-)
-
 from app.schemas.execution import ExecutionSummary
+from app.schemas.execution_status import ExecutionStatus, StepStatus
+
 
 class ExecutionPersistenceService:
     """
@@ -68,7 +65,7 @@ class ExecutionPersistenceService:
             started_at=execution.started_at,
             completed_at=execution.completed_at,
         )
-    
+
     def create_execution(
         self,
         session_id: str,
@@ -109,9 +106,7 @@ class ExecutionPersistenceService:
             )
 
         execution.status = (
-            ExecutionStatus.SUCCESS.value
-            if success
-            else ExecutionStatus.FAILED.value
+            ExecutionStatus.SUCCESS.value if success else ExecutionStatus.FAILED.value
         )
 
         return self.execution_repository.update(execution)
@@ -148,16 +143,8 @@ class ExecutionPersistenceService:
                 else StepStatus.FAILED.value
             ),
             tool_name=None,
-            output=(
-                json.dumps(output, indent=2)
-                if output is not None
-                else None
-            ),
-            error=(
-                output.get("error")
-                if isinstance(output, dict)
-                else None
-            ),
+            output=(json.dumps(output, indent=2) if output is not None else None),
+            error=(output.get("error") if isinstance(output, dict) else None),
             duration_ms=0,
             started_at=now,
             completed_at=now,
