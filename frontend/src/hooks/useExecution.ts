@@ -1,59 +1,138 @@
-import { useState } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   ExecutionService,
-  type StepResult,
-  type ExecutionSummary,
+  ExecutionWebSocketService,
+  type ExecutionEvent,
 } from "@/services/execution";
 
+import { useExecutionStore } from "@/store";
+
 export function useExecution() {
-  const [steps, setSteps] = useState<StepResult[]>([]);
+  const websocketRef =
+    useRef<ExecutionWebSocketService | null>(null);
 
-  const [execution, setExecution] =
-    useState<ExecutionSummary | null>(null);
+  const {
+    loading,
+    connected,
+    error,
+    execution,
+    steps,
+    events,
 
-  const [loading, setLoading] = useState(false);
+    setLoading,
+    setConnected,
+    setError,
+    setExecution,
+    setSteps,
+    addEvent,
+    clear,
+  } = useExecutionStore();
 
-  const [error, setError] =
-    useState<string | null>(null);
+  useEffect(() => {
+    return () => {
+      websocketRef.current?.disconnect();
+    };
+  }, []);
+
+  function connect(sessionId: string) {
+    if (
+      websocketRef.current?.isConnected
+    ) {
+      return;
+    }
+
+    const websocket =
+      new ExecutionWebSocketService(sessionId);
+
+    websocket.connect(
+      (event: ExecutionEvent) => {
+        addEvent(event);
+
+        switch (event.type) {
+          case "execution_started":
+            setLoading(true);
+            break;
+
+          case "execution_finished":
+            setLoading(false);
+            break;
+
+          default:
+            break;
+        }
+      },
+
+      () => {
+        setConnected(true);
+      },
+
+      () => {
+        setConnected(false);
+      },
+
+      () => {
+        setError("WebSocket connection failed.");
+      },
+    );
+
+    websocketRef.current = websocket;
+  }
 
   async function execute(
     sessionId: string,
     task: string,
   ) {
-    if (loading) return;
+    if (loading) {
+      return;
+    }
+
+    clear();
+
+    connect(sessionId);
 
     setLoading(true);
+
     setError(null);
 
     try {
-      const response =
-        await ExecutionService.execute({
-          session_id: sessionId,
-          task,
-        });
+      await ExecutionService.execute({
+        session_id: sessionId,
+        task,
+      });
 
-      setSteps(response.steps);
+      /**
+       * Everything after this point
+       * is driven by WebSocket events.
+       */
+    } catch (error) {
+      console.error(error);
 
-      setExecution(response.execution);
-    } catch (err) {
-      console.error("Execution Error:", err);
+      setLoading(false);
 
       setError(
-        "Failed to execute the plan. Please try again.",
+        "Failed to execute the plan.",
       );
-
-      setExecution(null);
-    } finally {
-      setLoading(false);
     }
   }
 
   return {
-    steps,
-    execution,
     loading,
+
+    connected,
+
     error,
+
+    execution,
+
+    steps,
+
+    events,
+
     execute,
+
+    setExecution,
+
+    setSteps,
   };
 }

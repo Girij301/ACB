@@ -1,19 +1,15 @@
 import { api } from "@/services/api";
 
-import type {
-  ExecuteRequest,
-  ExecutionResponse,
-} from "./types";
+import type { ExecuteRequest, ExecutionStartResponse } from "./types";
 
 export class ExecutionService {
   static async execute(
     payload: ExecuteRequest,
-  ): Promise<ExecutionResponse> {
-    const { data } =
-      await api.post<ExecutionResponse>(
-        "/execute",
-        payload,
-      );
+  ): Promise<ExecutionStartResponse> {
+    const { data } = await api.post<ExecutionStartResponse>(
+      "/execute",
+      payload,
+    );
 
     return data;
   }
