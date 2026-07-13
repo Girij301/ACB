@@ -11,15 +11,9 @@ class ExecutionEvent(BaseModel):
     """
 
     type: ExecutionEventType
-
     timestamp: datetime = Field(default_factory=datetime.utcnow)
-
     session_id: str | None = None
-
     execution_id: int | None = None
-
     step_number: int | None = None
-
     message: str
-
     payload: dict[str, Any] | None = None

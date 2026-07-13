@@ -9,58 +9,28 @@ import {
 import { useExecutionStore } from "@/store";
 
 export function useExecution() {
-  const websocketRef =
-    useRef<ExecutionWebSocketService | null>(null);
+  const websocketRef = useRef<ExecutionWebSocketService | null>(null);
 
-  const {
-    loading,
-    connected,
-    error,
-    execution,
-    steps,
-    events,
-
-    setLoading,
-    setConnected,
-    setError,
-    setExecution,
-    setSteps,
-    addEvent,
-    clear,
-  } = useExecutionStore();
+  const { state, dispatch, reset, setConnected, setError, setExecution } =
+    useExecutionStore();
 
   useEffect(() => {
     return () => {
       websocketRef.current?.disconnect();
+      websocketRef.current = null;
     };
   }, []);
 
   function connect(sessionId: string) {
-    if (
-      websocketRef.current?.isConnected
-    ) {
-      return;
+    if (websocketRef.current) {
+      websocketRef.current.disconnect();
     }
 
-    const websocket =
-      new ExecutionWebSocketService(sessionId);
+    const websocket = new ExecutionWebSocketService(sessionId);
 
     websocket.connect(
       (event: ExecutionEvent) => {
-        addEvent(event);
-
-        switch (event.type) {
-          case "execution_started":
-            setLoading(true);
-            break;
-
-          case "execution_finished":
-            setLoading(false);
-            break;
-
-          default:
-            break;
-        }
+        dispatch(event);
       },
 
       () => {
@@ -69,9 +39,11 @@ export function useExecution() {
 
       () => {
         setConnected(false);
+        websocketRef.current = null;
       },
 
       () => {
+        setConnected(false);
         setError("WebSocket connection failed.");
       },
     );
@@ -79,19 +51,14 @@ export function useExecution() {
     websocketRef.current = websocket;
   }
 
-  async function execute(
-    sessionId: string,
-    task: string,
-  ) {
-    if (loading) {
+  async function execute(sessionId: string, task: string) {
+    if (state.loading) {
       return;
     }
 
-    clear();
+    reset();
 
     connect(sessionId);
-
-    setLoading(true);
 
     setError(null);
 
@@ -100,39 +67,30 @@ export function useExecution() {
         session_id: sessionId,
         task,
       });
-
-      /**
-       * Everything after this point
-       * is driven by WebSocket events.
-       */
     } catch (error) {
       console.error(error);
 
-      setLoading(false);
-
-      setError(
-        "Failed to execute the plan.",
-      );
+      setError("Failed to execute the plan.");
     }
   }
 
   return {
-    loading,
-
-    connected,
-
-    error,
-
-    execution,
-
-    steps,
-
-    events,
-
+    loading: state.loading,
+    connected: state.connected,
+    error: state.error,
+    execution: state.execution,
+    steps: state.steps,
+    events: state.events,
+    activeStep: state.activeStep,
+    retryingStep: state.retryingStep,
+    debuggingStep: state.debuggingStep,
+    validating: state.validating,
+    totalSteps: state.totalSteps,
+    completedSteps: state.completedSteps,
+    successfulSteps: state.successfulSteps,
+    failedSteps: state.failedSteps,
+    progress: state.progress,
     execute,
-
     setExecution,
-
-    setSteps,
   };
 }

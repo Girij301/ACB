@@ -5,45 +5,33 @@ import { PlannerPanel } from "../PlannerPanel";
 import { ExecutionPanel } from "../ExecutionPanel";
 import { InspectorPanel } from "../InspectorPanel";
 
-import {
-  useChat,
-  usePlanner,
-  useExecution,
-} from "@/hooks";
+import { useChat, usePlanner, useExecution } from "@/hooks";
 
 import { workspaceContentVariants } from "./workspaceContentVariants";
 
 export function WorkspaceContent() {
   const sessionId = useMemo(() => crypto.randomUUID(), []);
 
-  const { messages, loading, sendMessage } =
-    useChat(sessionId);
+  const { messages, loading, sendMessage } = useChat(sessionId);
 
   const planner = usePlanner();
 
   const execution = useExecution();
 
-  const [currentTask, setCurrentTask] =
-    useState("");
+  const [currentTask, setCurrentTask] = useState("");
 
   async function handleSend(message: string) {
     setCurrentTask(message);
 
     await sendMessage(message);
 
-    await planner.createPlan(
-      sessionId,
-      message,
-    );
+    await planner.createPlan(sessionId, message);
   }
 
   async function handleExecute() {
     if (!currentTask) return;
 
-    await execution.execute(
-      sessionId,
-      currentTask,
-    );
+    await execution.execute(sessionId, currentTask);
   }
 
   return (
@@ -72,14 +60,16 @@ export function WorkspaceContent() {
               steps={execution.steps}
               loading={execution.loading}
               error={execution.error}
+              progress={execution.progress}
+              completedSteps={execution.completedSteps}
+              totalSteps={execution.totalSteps}
+              activeStep={execution.activeStep}
             />
           </div>
         </div>
 
         <div className="h-full min-h-[860px]">
-          <InspectorPanel
-            execution={execution.execution}
-          />
+          <InspectorPanel execution={execution.execution} />
         </div>
       </section>
     </main>

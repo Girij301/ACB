@@ -1,105 +1,74 @@
 import { create } from "zustand";
 
-import type {
-  ExecutionEvent,
-  ExecutionSummary,
-  StepResult,
+import {
+  executionReducer,
+  initialExecutionState,
+  type ExecutionState,
 } from "@/services/execution";
 
-interface ExecutionState {
-  loading: boolean;
+import type { ExecutionEvent } from "@/services/execution";
 
-  connected: boolean;
+interface ExecutionStore {
+  state: ExecutionState;
 
-  error: string | null;
+  setState: (state: ExecutionState) => void;
 
-  execution: ExecutionSummary | null;
-
-  steps: StepResult[];
-
-  events: ExecutionEvent[];
-
-  setLoading: (loading: boolean) => void;
+  dispatch: (event: ExecutionEvent) => void;
 
   setConnected: (connected: boolean) => void;
 
   setError: (error: string | null) => void;
 
   setExecution: (
-    execution: ExecutionSummary | null,
+    execution: ExecutionState["execution"],
   ) => void;
 
-  setSteps: (
-    steps: StepResult[],
-  ) => void;
-
-  addStep: (
-    step: StepResult,
-  ) => void;
-
-  addEvent: (
-    event: ExecutionEvent,
-  ) => void;
-
-  clear: () => void;
+  reset: () => void;
 }
 
 export const useExecutionStore =
-  create<ExecutionState>((set) => ({
-    loading: false,
+  create<ExecutionStore>((set, get) => ({
+    state: initialExecutionState,
 
-    connected: false,
-
-    error: null,
-
-    execution: null,
-
-    steps: [],
-
-    events: [],
-
-    setLoading: (loading) =>
+    setState: (state) =>
       set({
-        loading,
+        state,
+      }),
+
+    dispatch: (event) =>
+      set({
+        state: executionReducer(
+          get().state,
+          event,
+        ),
       }),
 
     setConnected: (connected) =>
-      set({
-        connected,
-      }),
+      set((store) => ({
+        state: {
+          ...store.state,
+          connected,
+        },
+      })),
 
     setError: (error) =>
-      set({
-        error,
-      }),
+      set((store) => ({
+        state: {
+          ...store.state,
+          error,
+        },
+      })),
 
     setExecution: (execution) =>
-      set({
-        execution,
-      }),
-
-    setSteps: (steps) =>
-      set({
-        steps,
-      }),
-
-    addStep: (step) =>
-      set((state) => ({
-        steps: [...state.steps, step],
+      set((store) => ({
+        state: {
+          ...store.state,
+          execution,
+        },
       })),
 
-    addEvent: (event) =>
-      set((state) => ({
-        events: [...state.events, event],
-      })),
-
-    clear: () =>
+    reset: () =>
       set({
-        loading: false,
-        connected: false,
-        error: null,
-        execution: null,
-        steps: [],
-        events: [],
+        state: initialExecutionState,
       }),
   }));
