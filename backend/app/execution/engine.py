@@ -207,10 +207,18 @@ class ExecutionEngine:
                                 execution=context.execution,
                                 success=False,
                             )
+                        summary = self._build_result(
+                            success=False,
+                            memory=memory,
+                            context=context,
+                        ).execution
+
                         self.events.execution_finished(
                             context=context,
                             success=False,
+                            execution=summary,
                         )
+
                         finished_event_sent = True
                         return self._build_result(
                             success=False,
@@ -299,9 +307,16 @@ class ExecutionEngine:
                         success=False,
                     )
 
+                summary = self._build_result(
+                    success=False,
+                    memory=memory,
+                    context=context,
+                ).execution
+
                 self.events.execution_finished(
                     context=context,
                     success=False,
+                    execution=summary,
                 )
                 finished_event_sent = True
 
@@ -318,10 +333,19 @@ class ExecutionEngine:
                     execution=context.execution,
                     success=True,
                 )
+
+            summary = self._build_result(
+                success=True,
+                memory=memory,
+                context=context,
+            ).execution
+
             self.events.execution_finished(
                 context=context,
                 success=True,
+                execution=summary,
             )
+
             finished_event_sent = True
             return self._build_result(
                 success=True,
@@ -332,9 +356,22 @@ class ExecutionEngine:
         except Exception:
 
             if not finished_event_sent:
+                summary = None
+
+                if (
+                    self.persistence_service is not None
+                    and context.execution is not None
+                ):
+                    summary = self._build_result(
+                        success=False,
+                        memory=memory,
+                        context=context,
+                    ).execution
+
                 self.events.execution_finished(
                     context=context,
                     success=False,
+                    execution=summary,
                 )
 
             raise

@@ -1,6 +1,5 @@
 import {
   Activity,
-  CheckCircle2,
   Clock3,
   FolderOpen,
   RotateCcw,

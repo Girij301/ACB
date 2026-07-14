@@ -30,7 +30,22 @@ export function useExecution() {
 
     websocket.connect(
       (event: ExecutionEvent) => {
+        console.log(
+          "EVENT TYPE:",
+          event.type,
+          "EXECUTION:",
+          event.execution_id,
+        );
+
         dispatch(event);
+
+        if (event.type === "execution_finished") {
+          websocket.disconnect();
+
+          websocketRef.current = null;
+
+          setConnected(false);
+        }
       },
 
       () => {
@@ -51,7 +66,7 @@ export function useExecution() {
     websocketRef.current = websocket;
   }
 
-  async function execute(sessionId: string, task: string) {
+  async function execute(sessionId: string, task: string, onStarted?: () => void,) {
     if (state.loading) {
       return;
     }
@@ -60,6 +75,8 @@ export function useExecution() {
 
     connect(sessionId);
 
+    onStarted?.();
+    
     setError(null);
 
     try {
@@ -90,6 +107,10 @@ export function useExecution() {
     successfulSteps: state.successfulSteps,
     failedSteps: state.failedSteps,
     progress: state.progress,
+    hasFailed: state.hasFailed,
+    currentPhase: state.currentPhase,
+    currentAction: state.currentAction,
+    timeline: state.timeline,
     execute,
     setExecution,
   };

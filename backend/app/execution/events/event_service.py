@@ -2,7 +2,7 @@ from app.execution.context import ExecutionContext
 from app.execution.events.event_types import ExecutionEventType
 from app.execution.events.execution_event import ExecutionEvent
 from app.execution.events.global_publisher import execution_event_publisher
-from app.schemas.execution import StepResult
+from app.schemas.execution import ExecutionSummary, StepResult
 from app.schemas.planner import PlanStep
 
 
@@ -32,6 +32,8 @@ class EventService:
                 message="Execution started.",
                 payload={
                     "total_steps": total_steps,
+                    "plan_id": context.plan_id,
+                    "workspace": str(context.workspace),
                 },
             )
         )
@@ -41,7 +43,15 @@ class EventService:
         *,
         context: ExecutionContext,
         success: bool,
+        execution: ExecutionSummary | None = None,
     ) -> None:
+        payload = {
+            "success": success,
+        }
+
+        if execution is not None:
+            payload["execution"] = execution.model_dump()
+
         self.publisher.publish(
             ExecutionEvent(
                 type=ExecutionEventType.EXECUTION_FINISHED,
@@ -50,9 +60,7 @@ class EventService:
                     context.execution.id if context.execution is not None else None
                 ),
                 message="Execution completed.",
-                payload={
-                    "success": success,
-                },
+                payload=payload,
             )
         )
 

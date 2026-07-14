@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { ChatPanel } from "../ChatPanel";
 import { PlannerPanel } from "../PlannerPanel";
-import { ExecutionPanel } from "../ExecutionPanel";
+import { AgentActivity } from "../AgentActivity";
 import { InspectorPanel } from "../InspectorPanel";
 
 import { useChat, usePlanner, useExecution } from "@/hooks";
@@ -20,57 +20,64 @@ export function WorkspaceContent() {
 
   const [currentTask, setCurrentTask] = useState("");
 
+  const [plannerCollapsed, setPlannerCollapsed] = useState(false);
+
   async function handleSend(message: string) {
     setCurrentTask(message);
+
+    setPlannerCollapsed(false);
 
     await sendMessage(message);
 
     await planner.createPlan(sessionId, message);
   }
 
-  async function handleExecute() {
-    if (!currentTask) return;
-
-    await execution.execute(sessionId, currentTask);
-  }
-
   return (
     <main className={workspaceContentVariants()}>
-      <section className="grid gap-5 xl:grid-cols-[2fr_360px]">
-        <div className="grid gap-5">
-          <div className="h-[360px]">
-            <ChatPanel
-              messages={messages}
-              loading={loading}
-              onSend={handleSend}
-            />
-          </div>
+      <section className="grid h-full min-h-0 gap-5 xl:grid-cols-[320px_minmax(0,1fr)_320px]">
 
-          <div className="h-[220px]">
-            <PlannerPanel
-              plan={planner.plan}
-              loading={planner.loading}
-              executing={execution.loading}
-              onExecute={handleExecute}
-            />
-          </div>
-
-          <div className="h-[260px]">
-            <ExecutionPanel
-              steps={execution.steps}
-              loading={execution.loading}
-              error={execution.error}
-              progress={execution.progress}
-              completedSteps={execution.completedSteps}
-              totalSteps={execution.totalSteps}
-              activeStep={execution.activeStep}
-            />
-          </div>
+        {/* Chat */}
+        <div className="min-h-0">
+          <ChatPanel
+            messages={messages}
+            loading={loading}
+            onSend={handleSend}
+          />
         </div>
 
-        <div className="h-full min-h-[860px]">
-          <InspectorPanel execution={execution.execution} />
+        {/* Planner + Execution */}
+        <div className="flex min-h-0 flex-col gap-4">
+
+          {planner.plan.length > 0 && (
+            <div
+              className={`overflow-hidden transition-all duration-500 ${
+                execution.loading
+                  ? "h-28 flex-shrink-0"
+                  : "h-[40%] min-h-[280px]"
+              }`}
+            >
+              <PlannerPanel
+                sessionId={sessionId}
+                task={currentTask}
+                plan={planner.plan}
+                loading={planner.loading}
+              />
+            </div>
+          )}
+
+          <div className="min-h-0 flex-1">
+            <AgentActivity />
+          </div>
+
         </div>
+
+        {/* Inspector */}
+        <div className="min-h-0">
+          <InspectorPanel
+            execution={execution.execution}
+          />
+        </div>
+
       </section>
     </main>
   );
