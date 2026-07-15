@@ -7,6 +7,9 @@ export const workspaceStatusBarVariants = cva(
     "flex",
     "items-center",
 
+    "h-10",
+    "flex-shrink-0",
+
     "border-t",
     "border-white/10",
 

@@ -8,6 +8,9 @@ export const workspaceHeaderVariants = cva(
     "items-center",
     "justify-between",
 
+    "h-14",
+    "flex-shrink-0",
+
     "border-b",
     "border-white/10",
 

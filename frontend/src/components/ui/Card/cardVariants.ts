@@ -1,13 +1,13 @@
 import { cva } from "class-variance-authority";
 
 export const cardVariants = cva(
-  ["rounded-3xl", "transition-all", "duration-200"],
+  ["rounded-xl", "transition-all", "duration-200"],
   {
     variants: {
       variant: {
         default: ["bg-white/5", "border", "border-white/10"],
 
-        glass: ["liquid-glass", "bg-white/5"],
+        glass: ["glass"],
 
         outline: ["border", "border-white/20", "bg-transparent"],
 

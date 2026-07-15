@@ -1,5 +1,7 @@
-import { useExecution } from "@/hooks";
 import { LoaderCircle } from "lucide-react";
+
+import { useExecution } from "@/hooks";
+
 import { ExecutionTimeline } from "./ExecutionTimeline";
 
 const BASE_PHASES = [
@@ -21,9 +23,9 @@ export function AgentActivity() {
     completedSteps,
     totalSteps,
     hasFailed,
+    loading,
   } = useExecution();
 
-  // Show Failed only once execution actually enters the Failed phase
   const phases = hasFailed
     ? [
         "Idle",
@@ -38,101 +40,267 @@ export function AgentActivity() {
 
   const activeIndex = phases.indexOf(currentPhase);
 
-  const isCompleted = currentPhase === "Completed";
-  const isFailed = currentPhase === "Failed";
+  const isCompleted =
+    currentPhase === "Completed";
+
+  const isFailed =
+    currentPhase === "Failed";
 
   return (
-    <section className="glass flex h-full flex-col rounded-2xl p-5">
+    <section
+      className="
+        glass
+        flex
+        h-full
+        flex-col
+        rounded-2xl
+        p-5
+      "
+    >
       <div className="mb-5">
-        <h2 className="text-lg font-semibold text-white">
+        <h2
+          className="
+            text-lg
+            font-semibold
+            text-white
+          "
+        >
           Agent Activity
         </h2>
 
-        <p className="mt-1 text-sm text-white/50">
-          Live execution progress will appear here.
+        <p
+          className="
+            mt-1
+            text-sm
+            text-white/50
+          "
+        >
+          Live execution monitoring
         </p>
       </div>
 
-      <div className="flex flex-1 flex-col gap-5 overflow-hidden">
+      <div
+        className="
+          flex
+          flex-1
+          flex-col
+          gap-6
+          overflow-hidden
+        "
+      >
         {/* Progress */}
-        <section className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-white">
-              Progress
-            </h3>
 
-            <span className="text-xs text-white/60">
+        <section
+          className="
+            rounded-2xl
+            border
+            border-white/10
+            bg-gradient-to-b
+            from-white/10
+            to-white/5
+            p-5
+            shadow-sm
+            transition-all
+            duration-300
+          "
+        >
+          <div
+            className="
+              mb-4
+              flex
+              items-center
+              justify-between
+            "
+          >
+            <div>
+              <h3
+                className="
+                  text-sm
+                  font-semibold
+                  text-white
+                "
+              >
+                Progress
+              </h3>
+
+              <p
+                className="
+                  mt-1
+                  text-xs
+                  text-white/45
+                "
+              >
+                Overall execution progress
+              </p>
+            </div>
+
+            <span
+              className="
+                rounded-full
+                bg-white/10
+                px-3
+                py-1
+                text-xs
+                text-white/70
+              "
+            >
               {completedSteps}/{totalSteps}
             </span>
           </div>
 
-          <div className="h-2 overflow-hidden rounded-full bg-white/10">
+          <div
+            className="
+              h-2.5
+              overflow-hidden
+              rounded-full
+              bg-white/10
+            "
+          >
             <div
-              className="h-full rounded-full bg-cyan-400 transition-all duration-300"
+              className="
+                h-full
+                rounded-full
+                bg-cyan-400
+                transition-all
+                duration-700
+              "
               style={{
                 width: `${progress}%`,
               }}
             />
           </div>
 
-          <p className="mt-2 text-xs text-white/50">
-            {progress}% complete
-          </p>
+          <div className="mt-3 flex items-center justify-between">
+            <p
+              className="
+                text-xs
+                text-white/50
+              "
+            >
+              {progress}% complete
+            </p>
+
+            <p
+              className="
+                text-xs
+                text-cyan-300
+              "
+            >
+              Live
+            </p>
+          </div>
         </section>
 
+        {/* Phase Timeline */}
 
-        {/* Agent Activity */}
-        <section className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <h3 className="mb-3 text-sm font-medium text-white">
-            Agent Activity
-          </h3>
+        <section
+          className="
+            rounded-2xl
+            border
+            border-white/10
+            bg-white/5
+            p-5
+          "
+        >
+          <div className="mb-5">
+            <h3
+              className="
+                text-sm
+                font-semibold
+                text-white
+              "
+            >
+              Agent State
+            </h3>
 
-          <div className="space-y-3">
+            <p
+              className="
+                mt-1
+                text-xs
+                text-white/45
+              "
+            >
+              Current execution lifecycle
+            </p>
+          </div>
+
+          <div className="space-y-4">
             {phases.map((phase, index) => {
               let completed = false;
               let active = false;
 
               if (isCompleted) {
-                completed = phase !== "Completed";
-                active = false;
+                completed =
+                  phase !== "Completed";
               } else if (isFailed) {
-                completed = phase !== "Failed";
-                active = phase === "Failed";
+                completed =
+                  phase !== "Failed";
+
+                active =
+                  phase === "Failed";
               } else {
-                completed = index < activeIndex;
-                active = phase === currentPhase;
+                completed =
+                  index < activeIndex;
+
+                active =
+                  phase === currentPhase;
               }
 
               return (
                 <div
                   key={phase}
-                  className="flex items-center gap-3"
+                  className="
+                    flex
+                    items-center
+                    gap-3
+                    transition-all
+                    duration-300
+                  "
                 >
-                  <div className="flex h-4 w-4 items-center justify-center">
+                  <div
+                    className="
+                      flex
+                      h-6
+                      w-6
+                      items-center
+                      justify-center
+                      rounded-full
+                      bg-black/20
+                    "
+                  >
                     {completed ? (
                       <span className="text-green-400">
                         ✓
                       </span>
                     ) : active ? (
                       <LoaderCircle
-                        className="h-4 w-4 animate-spin text-cyan-400"
-                        strokeWidth={2}
+                        className="
+                          h-4
+                          w-4
+                          animate-spin
+                          text-cyan-400
+                        "
                       />
                     ) : (
-                      <span className="text-white/40">
+                      <span className="text-white/30">
                         ○
                       </span>
                     )}
                   </div>
 
                   <span
-                    className={`text-sm ${
-                      completed
-                        ? "text-green-300"
-                        : active
-                          ? "text-white"
-                          : "text-white/50"
-                    }`}
+                    className={`
+                      text-sm
+                      transition-all
+                      duration-300
+                      ${
+                        completed
+                          ? "font-medium text-green-300"
+                          : active
+                            ? "font-medium text-white"
+                            : "text-white/50"
+                      }
+                    `}
                   >
                     {phase}
                   </span>
@@ -142,23 +310,98 @@ export function AgentActivity() {
           </div>
         </section>
 
-
         {/* Current Action */}
-        <section className="rounded-xl border border-white/10 bg-white/5 p-4">
-          <h3 className="mb-3 text-sm font-medium text-white">
-            Current Action
-          </h3>
 
-          <div className="rounded-lg border border-white/10 bg-black/20 px-3 py-2">
-            <p className="text-sm text-white/80">
-              {currentAction || "Waiting for execution..."}
+        <section
+          className="
+            rounded-2xl
+            border
+            border-cyan-500/10
+            bg-gradient-to-b
+            from-cyan-500/5
+            to-transparent
+            p-5
+          "
+        >
+          <div className="mb-4">
+            <h3
+              className="
+                text-sm
+                font-semibold
+                text-white
+              "
+            >
+              Current Action
+            </h3>
+
+            <p
+              className="
+                mt-1
+                text-xs
+                text-white/45
+              "
+            >
+              Live agent activity
             </p>
+          </div>
+
+          <div
+            className="
+              rounded-xl
+              border
+              border-white/10
+              bg-black/20
+              px-4
+              py-3
+              transition-all
+              duration-300
+            "
+          >
+            {loading ? (
+              <div
+                className="
+                  flex
+                  items-center
+                  gap-2
+                  text-sm
+                  text-white/70
+                "
+              >
+                <LoaderCircle
+                  className="
+                    h-4
+                    w-4
+                    animate-spin
+                    text-cyan-400
+                  "
+                />
+
+                Agent working...
+              </div>
+            ) : (
+              <p
+                className="
+                  text-sm
+                  text-white/80
+                "
+              >
+                {currentAction ||
+                  "Waiting for execution..."}
+              </p>
+            )}
           </div>
         </section>
 
+        {/* Timeline */}
 
-        {/* Execution Timeline */}
-        <div className="min-h-0 flex-1 overflow-hidden">
+        <div
+          className="
+            min-h-0
+            flex-1
+            overflow-hidden
+            pt-1
+          "
+        >
           <ExecutionTimeline />
         </div>
       </div>

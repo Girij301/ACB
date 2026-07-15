@@ -29,7 +29,10 @@ class DockerTerminalService:
 
         # Docker execution
         if context.container is not None:
-            return context.container.execute(command)
+            return context.container.execute(
+                command=command,
+                cwd=cwd,
+            )
 
         # Local execution
         return self.local_terminal.run(

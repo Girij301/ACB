@@ -20,12 +20,9 @@ export function WorkspaceContent() {
 
   const [currentTask, setCurrentTask] = useState("");
 
-  const [plannerCollapsed, setPlannerCollapsed] = useState(false);
 
   async function handleSend(message: string) {
     setCurrentTask(message);
-
-    setPlannerCollapsed(false);
 
     await sendMessage(message);
 

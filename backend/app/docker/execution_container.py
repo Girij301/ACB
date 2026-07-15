@@ -117,16 +117,14 @@ class ExecutionContainer:
     def execute(
         self,
         command: str,
+        cwd: str | None = None,
     ) -> ExecResult:
         """
-        Execute a command inside
-        the running container.
+        Execute a command inside the running container.
         """
 
-        if self.id is None:
-            raise RuntimeError("Container has not been created.")
-
         return self.docker.exec_run(
-            self.id,
-            command,
+            container_id=self.id,
+            command=command,
+            cwd=cwd,
         )

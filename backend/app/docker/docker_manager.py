@@ -272,6 +272,7 @@ class DockerManager:
         self,
         container_id: str,
         command: str,
+        cwd: str | None = None,
     ) -> ExecResult:
         """
         Execute a command inside
@@ -283,13 +284,21 @@ class DockerManager:
         if container is None:
             raise ContainerNotFoundError(container_id)
 
+        start = perf_counter()
+
+        # Resolve working directory inside the container.
+        workdir = None
+
+        if cwd:
+            workdir = f"/workspace/{cwd.strip('/')}"
+
         logger.info(
-            "Executing inside container %s: %s",
+            "Executing inside container %s (cwd=%s): %s",
             container.id,
+            workdir or "/workspace",
             command,
         )
 
-        start = perf_counter()
         exec_result = container.exec_run(
             [
                 "sh",
@@ -298,9 +307,10 @@ class DockerManager:
             ],
             stdout=True,
             stderr=True,
-        )
+            workdir=workdir,
+        )   
 
-        elapsed = time.perf_counter() - start
+        elapsed = perf_counter() - start
 
         output = exec_result.output.decode(
             "utf-8",
