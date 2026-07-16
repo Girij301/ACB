@@ -83,18 +83,21 @@ export function AgentActivity() {
 
       <div
         className="
-          flex
-          min-h-0
-          flex-1
-          flex-col
-          gap-6
-          overflow-hidden
-        "
+        flex
+        min-h-0
+        flex-1
+        flex-col
+        gap-6
+        overflow-y-auto
+        pr-2
+      "
       >
+
         {/* Progress */}
 
         <section
           className="
+            shrink-0
             rounded-2xl
             border
             border-white/10
@@ -198,15 +201,13 @@ export function AgentActivity() {
 
         <section
           className="
-            min-h-0
-            flex
-            flex-col
-            rounded-2xl
-            border
-            border-white/10
-            bg-white/5
-            p-5
-          "
+          shrink-0
+          rounded-2xl
+          border
+          border-white/10
+          bg-white/5
+          p-5
+        "
         >
           <div className="mb-5">
             <h3
@@ -232,11 +233,7 @@ export function AgentActivity() {
 
           <div
             className="
-              min-h-0
-              flex-1
               space-y-4
-              overflow-y-auto
-              pr-2
             "
           >
             {phases.map((phase, index) => {
@@ -327,6 +324,7 @@ export function AgentActivity() {
 
         <section
           className="
+            shrink-0
             rounded-2xl
             border
             border-cyan-500/10
@@ -409,11 +407,12 @@ export function AgentActivity() {
 
         <div
           className="
-            min-h-0
-            flex-1
-            overflow-y-auto
-            pt-1
-          "
+          shrink-0
+          min-h-0
+          flex-1
+          overflow-y-auto
+          pt-1
+        "
         >
           <ExecutionTimeline />
         </div>

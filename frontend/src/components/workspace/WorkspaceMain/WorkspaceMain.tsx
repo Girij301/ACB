@@ -16,25 +16,30 @@ export function WorkspaceMain() {
 
   return (
     <main className={workspaceMainVariants()}>
-      <div className="flex min-h-0 flex-1 gap-5">
-        {/* Left Workspace Area */}
-        {!layout.sidebarCollapsed && <WorkspaceSidebar />}
+      <div className="flex h-full min-h-0 flex-1 gap-5 overflow-hidden">
 
-        {/* Main Workspace */}
-        <div className="flex min-h-0 flex-1 flex-col gap-5">
-          <div className="min-h-0 flex-1">
+        {!layout.sidebarCollapsed && (
+          <WorkspaceSidebar />
+        )}
+
+        <div className="flex h-full min-h-0 flex-1 flex-col gap-5">
+
+          <div className="h-full min-h-0 flex-1">
             <WorkspaceContent />
           </div>
 
-          {!layout.bottomPanelCollapsed && <BottomPanel />}
+          {!layout.bottomPanelCollapsed && (
+            <BottomPanel />
+          )}
+
         </div>
 
-        {/* Right Inspector */}
         {!layout.inspectorCollapsed && (
-          <div className="w-[320px] min-h-0 shrink-0">
+          <div className="h-full w-[320px] min-h-0 shrink-0">
             <InspectorPanel execution={execution} />
           </div>
         )}
+
       </div>
     </main>
   );

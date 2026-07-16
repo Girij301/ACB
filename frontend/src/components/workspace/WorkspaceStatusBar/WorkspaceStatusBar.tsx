@@ -10,7 +10,6 @@ import { workspaceStatusBarVariants } from "./workspaceStatusBarVariants";
 
 export function WorkspaceStatusBar() {
   const {
-    connected,
     loading,
     currentPhase,
     progress,
@@ -22,21 +21,6 @@ export function WorkspaceStatusBar() {
         {/* Left */}
 
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-white/70">
-            <Wifi
-              className={`h-4 w-4 ${
-                connected
-                  ? "text-emerald-400"
-                  : "text-amber-400"
-              }`}
-            />
-
-            <span>
-              {connected
-                ? "Connected"
-                : "Disconnected"}
-            </span>
-          </div>
 
           <div className="h-4 w-px bg-white/10" />
 

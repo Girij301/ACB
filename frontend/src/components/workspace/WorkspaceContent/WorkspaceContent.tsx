@@ -48,7 +48,7 @@ export function WorkspaceContent() {
 
   return (
     <main className={workspaceContentVariants()}>
-      <div className="flex h-full min-h-0 flex-col gap-4">
+      <div className="flex h-full min-h-0 flex-1 flex-col gap-4">
         {layout.selectedView === "chat" && (
           <ChatPanel
             messages={messages}
@@ -69,7 +69,7 @@ export function WorkspaceContent() {
         {layout.selectedView === "workspace" && (
           <div className="grid h-full min-h-0 gap-5 xl:grid-cols-[320px_minmax(0,1fr)]">
             {/* Chat */}
-            <div className="min-h-0">
+            <div className="h-full min-h-0 overflow-hidden">
               <ChatPanel
                 messages={messages}
                 loading={loading}
@@ -79,9 +79,11 @@ export function WorkspaceContent() {
 
             {/* Planner + Agent */}
             <div className="flex min-h-0 flex-col gap-4">
+
               {planner.plan.length > 0 && (
                 <div
-                  className={`flex-shrink-0 overflow-hidden transition-all duration-500 ${execution.loading
+                  className={`flex-shrink-0 overflow-hidden transition-all duration-500 ${
+                    execution.loading
                       ? "h-28"
                       : "h-80"
                     }`}

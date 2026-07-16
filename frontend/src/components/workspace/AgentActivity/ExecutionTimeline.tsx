@@ -61,16 +61,16 @@ export function ExecutionTimeline() {
   return (
     <section
       className="
-        flex
-        h-full
-        min-h-0
-        flex-col
-        rounded-2xl
-        border
-        border-white/10
-        bg-white/5
-        p-5
-      "
+      flex
+      h-full
+      min-h-0
+      flex-col
+      rounded-2xl
+      border
+      border-white/10
+      bg-white/5
+      p-5
+    "
     >
       <div className="mb-5 flex items-start justify-between">
         <div>
@@ -94,11 +94,11 @@ export function ExecutionTimeline() {
 
       <div
         className="
-          min-h-0
-          flex-1
-          overflow-y-auto
-          pr-2
-        "
+        min-h-0
+        flex-1
+        overflow-y-auto
+        pr-2
+      "
       >
         {groupedTimeline.length === 0 ? (
           <div className="flex h-full items-center justify-center">
