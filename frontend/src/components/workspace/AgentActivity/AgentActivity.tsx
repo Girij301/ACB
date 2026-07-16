@@ -28,14 +28,14 @@ export function AgentActivity() {
 
   const phases = hasFailed
     ? [
-        "Idle",
-        "Executing",
-        "Failed",
-        "Retrying",
-        "Debugging",
-        "Validation",
-        "Completed",
-      ]
+      "Idle",
+      "Executing",
+      "Failed",
+      "Retrying",
+      "Debugging",
+      "Validation",
+      "Completed",
+    ]
     : BASE_PHASES;
 
   const activeIndex = phases.indexOf(currentPhase);
@@ -52,6 +52,8 @@ export function AgentActivity() {
         glass
         flex
         h-full
+        min-h-0
+        overflow-hidden
         flex-col
         rounded-2xl
         p-5
@@ -82,6 +84,7 @@ export function AgentActivity() {
       <div
         className="
           flex
+          min-h-0
           flex-1
           flex-col
           gap-6
@@ -195,6 +198,9 @@ export function AgentActivity() {
 
         <section
           className="
+            min-h-0
+            flex
+            flex-col
             rounded-2xl
             border
             border-white/10
@@ -224,7 +230,15 @@ export function AgentActivity() {
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div
+            className="
+              min-h-0
+              flex-1
+              space-y-4
+              overflow-y-auto
+              pr-2
+            "
+          >
             {phases.map((phase, index) => {
               let completed = false;
               let active = false;
@@ -293,12 +307,11 @@ export function AgentActivity() {
                       text-sm
                       transition-all
                       duration-300
-                      ${
-                        completed
-                          ? "font-medium text-green-300"
-                          : active
-                            ? "font-medium text-white"
-                            : "text-white/50"
+                      ${completed
+                        ? "font-medium text-green-300"
+                        : active
+                          ? "font-medium text-white"
+                          : "text-white/50"
                       }
                     `}
                   >
@@ -398,7 +411,7 @@ export function AgentActivity() {
           className="
             min-h-0
             flex-1
-            overflow-hidden
+            overflow-y-auto
             pt-1
           "
         >

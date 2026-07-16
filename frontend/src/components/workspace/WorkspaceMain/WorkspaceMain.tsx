@@ -1,16 +1,41 @@
 import {
+  BottomPanel,
+  InspectorPanel,
   WorkspaceContent,
   WorkspaceSidebar,
 } from "@/components/workspace";
 
+import { useExecution } from "@/hooks";
+
 import { workspaceMainVariants } from "./workspaceMainVariants";
+import { useWorkspaceStore } from "@/store";
 
 export function WorkspaceMain() {
-  return (
-    <div className={workspaceMainVariants()}>
-      <WorkspaceSidebar />
+  const { execution } = useExecution();
+  const { layout } = useWorkspaceStore();
 
-      <WorkspaceContent />
-    </div>
+  return (
+    <main className={workspaceMainVariants()}>
+      <div className="flex min-h-0 flex-1 gap-5">
+        {/* Left Workspace Area */}
+        {!layout.sidebarCollapsed && <WorkspaceSidebar />}
+
+        {/* Main Workspace */}
+        <div className="flex min-h-0 flex-1 flex-col gap-5">
+          <div className="min-h-0 flex-1">
+            <WorkspaceContent />
+          </div>
+
+          {!layout.bottomPanelCollapsed && <BottomPanel />}
+        </div>
+
+        {/* Right Inspector */}
+        {!layout.inspectorCollapsed && (
+          <div className="w-[320px] min-h-0 shrink-0">
+            <InspectorPanel execution={execution} />
+          </div>
+        )}
+      </div>
+    </main>
   );
 }

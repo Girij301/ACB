@@ -1,6 +1,6 @@
 import {
   WorkspaceHeader,
-  WorkspaceContent,
+  WorkspaceMain,
   WorkspaceStatusBar,
 } from "@/components/workspace";
 
@@ -8,12 +8,14 @@ import { workspaceVariants } from "./workspaceVariants";
 
 export function Workspace() {
   return (
-    <main className={workspaceVariants()}>
-      <WorkspaceHeader />
+    <main className="flex h-screen flex-col bg-background text-white">
+      {/* <WorkspaceHeader /> */}
 
-      <WorkspaceContent />
+      <div className="flex-1 min-h-0">
+        <WorkspaceMain />
+      </div>
 
-      <WorkspaceStatusBar />
+      {/* <WorkspaceStatusBar /> */}
     </main>
   );
 }

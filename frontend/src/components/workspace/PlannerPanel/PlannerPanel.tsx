@@ -1,4 +1,9 @@
-import { LoaderCircle, Play } from "lucide-react";
+import {
+  LoaderCircle,
+  Play,
+  Route,
+  Sparkles,
+} from "lucide-react";
 
 import { useExecution } from "@/hooks";
 
@@ -26,7 +31,7 @@ export function PlannerPanel({
 
   function getStepStatus(stepNumber: number) {
     const executionStep = steps.find(
-      (step) => step.step_number === stepNumber,
+      (step) => step.step_number === stepNumber
     );
 
     if (!executionStep) {
@@ -69,18 +74,39 @@ export function PlannerPanel({
   }
 
   return (
-    <section className="glass flex h-full flex-col rounded-2xl p-5">
+    <section className="glass flex h-full min-h-0 flex-col rounded-2xl p-5">
       {/* Header */}
 
-      <div className="mb-5 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-white">
-            Planner
-          </h2>
+      <div className="mb-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className="
+              flex
+              h-11
+              w-11
+              items-center
+              justify-center
+              rounded-xl
+              bg-cyan-500/10
+              text-cyan-300
+            "
+          >
+            <Route className="h-5 w-5" />
+          </div>
 
-          <p className="mt-1 text-sm text-white/50">
-            Execution roadmap
-          </p>
+          <div>
+            <div className="flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-white">
+                Execution Plan
+              </h2>
+
+              <Sparkles className="h-4 w-4 text-cyan-400" />
+            </div>
+
+            <p className="mt-1 text-sm text-white/45">
+              AI generated implementation roadmap
+            </p>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
@@ -113,17 +139,19 @@ export function PlannerPanel({
                 gap-2
                 rounded-xl
                 border
-                border-cyan-400/20
+                border-cyan-500/20
                 bg-cyan-500/10
-                px-4
-                py-2
+                px-5
+                py-2.5
                 text-sm
                 font-medium
                 text-cyan-300
                 transition-all
                 duration-300
-                hover:border-cyan-400/40
+                hover:scale-[1.02]
+                hover:border-cyan-500/40
                 hover:bg-cyan-500/20
+                hover:shadow-[0_0_16px_rgba(34,211,238,0.12)]
                 disabled:cursor-not-allowed
                 disabled:opacity-50
               "
@@ -148,6 +176,7 @@ export function PlannerPanel({
 
       <div
         className="
+          min-h-0
           flex-1
           overflow-y-auto
           rounded-xl

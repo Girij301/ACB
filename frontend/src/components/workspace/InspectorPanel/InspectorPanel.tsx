@@ -41,12 +41,26 @@ function MetricCard({
   value,
 }: MetricCardProps) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-      <p className="text-xs uppercase tracking-wide text-white/40">
+    <div
+      className="
+        rounded-2xl
+        border
+        border-white/10
+        bg-gradient-to-b
+        from-white/10
+        to-white/5
+        p-4
+        transition-all
+        duration-300
+        hover:border-cyan-500/20
+        hover:bg-white/10
+      "
+    >
+      <p className="text-xs uppercase tracking-wide text-white/45">
         {label}
       </p>
 
-      <p className="mt-3 text-2xl font-semibold text-white">
+      <p className="mt-3 text-3xl font-semibold text-white">
         {value}
       </p>
     </div>
@@ -57,11 +71,24 @@ export function InspectorPanel({
   execution,
 }: InspectorPanelProps) {
   return (
-    <section className="glass flex h-full flex-col rounded-2xl p-5">
-      <div className="mb-6 flex items-center justify-between">
+    <section className="glass flex h-full min-h-0 flex-col rounded-2xl p-5">
+      <div className="mb-8 flex items-center justify-between">
         <div>
           <h2 className="flex items-center gap-2 text-lg font-semibold text-white">
-            <Activity className="h-5 w-5 text-cyan-400" />
+            <div
+              className="
+                flex
+                h-11
+                w-11
+                items-center
+                justify-center
+                rounded-xl
+                bg-cyan-500/10
+                text-cyan-300
+              "
+            >
+              <Activity className="h-5 w-5" />
+            </div>
             Inspector
           </h2>
 
@@ -78,22 +105,37 @@ export function InspectorPanel({
       {!execution ? (
         <div className="flex flex-1 items-center justify-center rounded-2xl border border-dashed border-white/10 bg-black/20">
           <div className="max-w-xs text-center">
-            <Activity className="mx-auto h-10 w-10 text-white/20" />
+            <div
+              className="
+                mx-auto
+                flex
+                h-16
+                w-16
+                items-center
+                justify-center
+                rounded-2xl
+                bg-gradient-to-b
+                from-white/10
+                to-white/5
+              "
+            >
+              <Activity className="h-8 w-8 text-cyan-400/70" />
+            </div>
 
             <h3 className="mt-4 text-base font-semibold text-white">
-              No Active Execution
+              Execution Inspector
             </h3>
 
             <p className="mt-2 text-sm leading-6 text-white/45">
-              Execute a plan to inspect runtime
-              information, execution metrics and
-              workspace details.
+              Execution metrics, workspace information,
+              runtime statistics and recovery data will
+              appear here once execution begins.
             </p>
           </div>
         </div>
       ) : (
-        <div className="space-y-6 overflow-y-auto">
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+        <div className="min-h-0 flex-1 space-y-6 overflow-y-auto pr-1">
+          <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-5">
             <h3 className="mb-4 text-sm font-semibold text-white">
               Execution Details
             </h3>
@@ -154,7 +196,7 @@ export function InspectorPanel({
             />
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-5">
             <h3 className="mb-4 text-sm font-semibold text-white">
               Recovery Metrics
             </h3>
@@ -195,18 +237,18 @@ export function InspectorPanel({
             </div>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-black/30 p-5">
+          <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-cyan-500/5 to-transparent p-5">
             <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-white">
               <FolderOpen className="h-4 w-4 text-cyan-400" />
               Workspace
             </div>
 
-            <code className="block break-all rounded-xl bg-black/40 p-3 font-mono text-xs text-cyan-300">
+            <code className="block break-all rounded-xl bg-black/30 border border-white/10 p-3 font-mono text-xs text-cyan-300">
               {execution.workspace}
             </code>
           </section>
 
-          <section className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <section className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/10 to-white/5 p-5">
             <div className="flex items-center gap-2 text-sm font-semibold text-white">
               <Clock3 className="h-4 w-4 text-cyan-400" />
               Started
