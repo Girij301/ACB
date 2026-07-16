@@ -6,13 +6,15 @@ import {
   type ExecutionEvent,
 } from "@/services/execution";
 
-import { useExecutionStore } from "@/store";
+import { useExecutionStore,  useWorkspaceStore, } from "@/store";
 
 export function useExecution() {
   const websocketRef = useRef<ExecutionWebSocketService | null>(null);
 
   const { state, dispatch, reset, setConnected, setError, setExecution } =
     useExecutionStore();
+
+  const { refreshExplorer } = useWorkspaceStore();
 
   useEffect(() => {
     return () => {
@@ -40,6 +42,8 @@ export function useExecution() {
         dispatch(event);
 
         if (event.type === "execution_finished") {
+          refreshExplorer();
+
           websocket.disconnect();
 
           websocketRef.current = null;
@@ -66,7 +70,11 @@ export function useExecution() {
     websocketRef.current = websocket;
   }
 
-  async function execute(sessionId: string, task: string, onStarted?: () => void,) {
+  async function execute(
+    sessionId: string,
+    task: string,
+    onStarted?: () => void,
+  ) {
     if (state.loading) {
       return;
     }
@@ -76,7 +84,7 @@ export function useExecution() {
     connect(sessionId);
 
     onStarted?.();
-    
+
     setError(null);
 
     try {

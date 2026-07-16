@@ -1,16 +1,16 @@
 import {
   FolderOpen,
-  FolderTree,
   History,
   ListTodo,
   MessageSquare,
   PanelLeftClose,
   Settings,
-  Sparkles,
   Terminal,
 } from "lucide-react";
 
 import { useWorkspaceStore } from "@/store";
+
+import { Explorer } from "../Explorer";
 
 import { workspaceSidebarVariants } from "./workspaceSidebarVariants";
 
@@ -44,12 +44,11 @@ function SidebarButton({
         py-3
         transition-all
         duration-200
-        ${
-          active
-            ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.08)]"
-            : disabled
-              ? "cursor-not-allowed border-transparent text-white/30 opacity-50"
-              : "border-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white"
+        ${active
+          ? "border-cyan-500/20 bg-cyan-500/10 text-cyan-300 shadow-[0_0_12px_rgba(34,211,238,0.08)]"
+          : disabled
+            ? "cursor-not-allowed border-transparent text-white/30 opacity-50"
+            : "border-transparent text-white/60 hover:border-white/10 hover:bg-white/5 hover:text-white"
         }
       `}
     >
@@ -61,10 +60,9 @@ function SidebarButton({
           items-center
           justify-center
           rounded-lg
-          ${
-            active
-              ? "bg-cyan-500/15"
-              : "bg-white/5 group-hover:bg-white/10"
+          ${active
+            ? "bg-cyan-500/15"
+            : "bg-white/5 group-hover:bg-white/10"
           }
         `}
       >
@@ -158,12 +156,9 @@ export function WorkspaceSidebar() {
 
         <div className="my-4 border-t border-white/10" />
 
-        <SidebarButton
-          active={false}
-          disabled
-          icon={<FolderTree className="h-4 w-4" />}
-          label="Explorer"
-        />
+        <div className="h-80">
+          <Explorer />
+        </div>
 
         <SidebarButton
           active={false}
@@ -199,7 +194,7 @@ export function WorkspaceSidebar() {
         </div>
 
         <p className="mt-3 text-xs leading-6 text-white/45">
-          Explorer, Monaco Editor, Terminal and
+          Monaco Editor, Terminal and
           History will become available in upcoming
           milestones.
         </p>

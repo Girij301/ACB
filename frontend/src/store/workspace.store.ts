@@ -1,12 +1,19 @@
 import { create } from "zustand";
 
 import type { PlanStep } from "@/services/planner";
+import { WorkspaceService } from "@/services/workspace";
 
 const STORAGE_KEY = "acb-workspace-layout";
 
 type WorkspaceView = "chat" | "workspace" | "planner";
 
 type WorkspacePanel = "chat" | "planner" | "activity";
+
+export interface ExplorerItem {
+  name: string;
+  type: "directory" | "file";
+  path: string;
+}
 
 interface LayoutState {
   activePanel: WorkspacePanel;
@@ -26,9 +33,27 @@ interface WorkspaceState {
 
   selectedFile: string | null;
 
+  fileContent: string | null;
+
   currentWorkspace: string | null;
 
   plan: PlanStep[];
+
+  explorerTree: ExplorerItem[];
+
+  folderChildren: Record<string, ExplorerItem[]>;
+
+  loadedFolders: string[];
+
+  expandedFolders: string[];
+
+  explorerLoading: boolean;
+
+  explorerRefreshing: boolean;
+
+  explorerSearchQuery: string;
+
+  explorerAutoRefresh: boolean;
 
   /* Layout State */
 
@@ -38,11 +63,37 @@ interface WorkspaceState {
 
   setSelectedFile: (file: string | null) => void;
 
+  setFileContent: (content: string | null) => void;
+
   setWorkspace: (workspace: string | null) => void;
 
   setPlan: (plan: PlanStep[]) => void;
 
   clearPlan: () => void;
+
+  /*workspace action */
+
+  setExplorerTree: (tree: ExplorerItem[]) => void;
+
+  setFolderChildren: (folder: string, children: ExplorerItem[]) => void;
+
+  markFolderLoaded: (folder: string) => void;
+
+  loadFolder: (folder: string) => Promise<void>;
+
+  refreshExplorer: () => Promise<void>;
+
+  toggleFolder: (path: string) => void;
+
+  setExplorerLoading: (loading: boolean) => void;
+
+  setExplorerRefreshing: (refreshing: boolean) => void;
+
+  setExplorerSearchQuery: (query: string) => void;
+
+  setExplorerAutoRefresh: (enabled: boolean) => void;
+
+  resetExplorer: () => void;
 
   /* Layout Actions */
 
@@ -97,9 +148,27 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
   selectedFile: null,
 
+  fileContent: null,
+
   currentWorkspace: null,
 
   plan: [],
+
+  explorerTree: [],
+
+  folderChildren: {},
+
+  loadedFolders: [],
+
+  expandedFolders: [],
+
+  explorerLoading: false,
+
+  explorerRefreshing: false,
+
+  explorerSearchQuery: "",
+
+  explorerAutoRefresh: true,
 
   /* New */
 
@@ -110,6 +179,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   setSelectedFile: (selectedFile) =>
     set({
       selectedFile,
+    }),
+
+  setFileContent: (fileContent) =>
+    set({
+      fileContent,
     }),
 
   setWorkspace: (currentWorkspace) =>
@@ -125,6 +199,102 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   clearPlan: () =>
     set({
       plan: [],
+    }),
+
+  setExplorerTree: (explorerTree) =>
+    set({
+      explorerTree,
+    }),
+
+  setFolderChildren: (folder, children) =>
+    set((state) => ({
+      folderChildren: {
+        ...state.folderChildren,
+        [folder]: children,
+      },
+    })),
+
+  markFolderLoaded: (folder) =>
+    set((state) => ({
+      loadedFolders: [...state.loadedFolders, folder],
+    })),
+
+  loadFolder: async (folder) => {
+    const state = get();
+
+    if (state.loadedFolders.includes(folder)) {
+      return;
+    }
+
+    try {
+      const response = await WorkspaceService.listDirectory({
+        path: folder,
+      });
+
+      get().setFolderChildren(folder, response.data.items);
+
+      get().markFolderLoaded(folder);
+    } catch (error) {
+      console.error("Failed loading folder:", error);
+    }
+  },
+
+  refreshExplorer: async () => {
+    set({
+      explorerRefreshing: true,
+    });
+
+    try {
+      const response = await WorkspaceService.listDirectory();
+
+      set({
+        explorerTree: response.data.items,
+      });
+    } catch (error) {
+      console.error("Explorer refresh failed:", error);
+    } finally {
+      set({
+        explorerRefreshing: false,
+      });
+    }
+  },
+
+  toggleFolder: (path) =>
+    set((state) => ({
+      expandedFolders: state.expandedFolders.includes(path)
+        ? state.expandedFolders.filter((folder) => folder !== path)
+        : [...state.expandedFolders, path],
+    })),
+
+  setExplorerLoading: (explorerLoading) =>
+    set({
+      explorerLoading,
+    }),
+
+  setExplorerRefreshing: (explorerRefreshing) =>
+    set({
+      explorerRefreshing,
+    }),
+
+  setExplorerSearchQuery: (explorerSearchQuery) =>
+    set({
+      explorerSearchQuery,
+    }),
+
+  setExplorerAutoRefresh: (explorerAutoRefresh) =>
+    set({
+      explorerAutoRefresh,
+    }),
+
+  resetExplorer: () =>
+    set({
+      explorerTree: [],
+      folderChildren: {},
+      loadedFolders: [],
+      expandedFolders: [],
+      explorerLoading: false,
+      explorerRefreshing: false,
+      explorerSearchQuery: "",
     }),
 
   /* New */
