@@ -1,4 +1,6 @@
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, ChevronDown, ChevronRight } from "lucide-react";
+
+import { useState } from "react";
 
 import { useExecution } from "@/hooks";
 
@@ -26,6 +28,9 @@ export function AgentActivity() {
     loading,
   } = useExecution();
 
+  const [agentStateCollapsed, setAgentStateCollapsed] =
+    useState(false);
+
   const phases = hasFailed
     ? [
       "Idle",
@@ -45,6 +50,7 @@ export function AgentActivity() {
 
   const isFailed =
     currentPhase === "Failed";
+
 
   return (
     <section
@@ -83,13 +89,14 @@ export function AgentActivity() {
 
       <div
         className="
-        flex
         min-h-0
         flex-1
-        flex-col
-        gap-6
         overflow-y-auto
-        pr-2
+        rounded-2xl
+        border
+        border-white/10
+        bg-black/20
+        p-5
       "
       >
 
@@ -108,6 +115,7 @@ export function AgentActivity() {
             shadow-sm
             transition-all
             duration-300
+            mb-6
           "
         >
           <div
@@ -207,69 +215,81 @@ export function AgentActivity() {
           border-white/10
           bg-white/5
           p-5
+          mb-6
         "
         >
-          <div className="mb-5">
-            <h3
-              className="
-                text-sm
-                font-semibold
-                text-white
-              "
-            >
-              Agent State
-            </h3>
-
-            <p
-              className="
-                mt-1
-                text-xs
-                text-white/45
-              "
-            >
-              Current execution lifecycle
-            </p>
-          </div>
-
-          <div
+          <button
+            type="button"
+            onClick={() =>
+              setAgentStateCollapsed(
+                !agentStateCollapsed,
+              )
+            }
             className="
+            mb-5
+            flex
+            w-full
+            items-center
+            justify-between
+            text-left
+          "
+          >
+            <div>
+              <h3 className="text-sm font-semibold text-white">
+                Agent State
+              </h3>
+
+              <p className="mt-1 text-xs text-white/45">
+                Current execution lifecycle
+              </p>
+            </div>
+
+            {agentStateCollapsed ? (
+              <ChevronRight className="h-4 w-4 text-white/50" />
+            ) : (
+              <ChevronDown className="h-4 w-4 text-white/50" />
+            )}
+          </button>
+          {!agentStateCollapsed && (
+            <div
+              className="
               space-y-4
             "
-          >
-            {phases.map((phase, index) => {
-              let completed = false;
-              let active = false;
+            >
+              {phases.map((phase, index) => {
+                let completed = false;
+                let active = false;
 
-              if (isCompleted) {
-                completed =
-                  phase !== "Completed";
-              } else if (isFailed) {
-                completed =
-                  phase !== "Failed";
+                if (isCompleted) {
+                  completed =
+                    phase !== "Completed";
+                } else if (isFailed) {
+                  completed =
+                    phase !== "Failed";
 
-                active =
-                  phase === "Failed";
-              } else {
-                completed =
-                  index < activeIndex;
+                  active =
+                    phase === "Failed";
+                } else {
+                  completed =
+                    index < activeIndex;
 
-                active =
-                  phase === currentPhase;
-              }
+                  active =
+                    phase === currentPhase;
+                }
 
-              return (
-                <div
-                  key={phase}
-                  className="
+                return (
+                  <div
+                    key={phase}
+                    className="
                     flex
                     items-center
                     gap-3
                     transition-all
                     duration-300
                   "
-                >
-                  <div
-                    className="
+                  >
+                    <div
+                      className="
                       flex
                       h-6
                       w-6
@@ -278,46 +298,47 @@ export function AgentActivity() {
                       rounded-full
                       bg-black/20
                     "
-                  >
-                    {completed ? (
-                      <span className="text-green-400">
-                        ✓
-                      </span>
-                    ) : active ? (
-                      <LoaderCircle
-                        className="
+                    >
+                      {completed ? (
+                        <span className="text-green-400">
+                          ✓
+                        </span>
+                      ) : active ? (
+                        <LoaderCircle
+                          className="
                           h-4
                           w-4
                           animate-spin
                           text-cyan-400
                         "
-                      />
-                    ) : (
-                      <span className="text-white/30">
-                        ○
-                      </span>
-                    )}
-                  </div>
+                        />
+                      ) : (
+                        <span className="text-white/30">
+                          ○
+                        </span>
+                      )}
+                    </div>
 
-                  <span
-                    className={`
+                    <span
+                      className={`
                       text-sm
                       transition-all
                       duration-300
                       ${completed
-                        ? "font-medium text-green-300"
-                        : active
-                          ? "font-medium text-white"
-                          : "text-white/50"
-                      }
+                          ? "font-medium text-green-300"
+                          : active
+                            ? "font-medium text-white"
+                            : "text-white/50"
+                        }
                     `}
-                  >
-                    {phase}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+                    >
+                      {phase}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
 
         {/* Current Action */}
@@ -332,6 +353,7 @@ export function AgentActivity() {
             from-cyan-500/5
             to-transparent
             p-5
+            mb-6
           "
         >
           <div className="mb-4">
@@ -404,18 +426,17 @@ export function AgentActivity() {
         </section>
 
         {/* Timeline */}
-
-        <div
-          className="
-          shrink-0
-          min-h-0
-          flex-1
-          overflow-y-auto
-          pt-1
-        "
-        >
-          <ExecutionTimeline />
-        </div>
+        <section>
+          <div
+            className="
+            shrink-0
+            min-h-0
+            pt-1
+          "
+          >
+            <ExecutionTimeline />
+          </div>
+        </section>
       </div>
     </section>
   );

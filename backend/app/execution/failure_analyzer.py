@@ -53,14 +53,29 @@ class FailureAnalyzer:
             )
 
         # Terminal failures
+        # Terminal failures
         if action == ActionType.RUN_TERMINAL.value:
             exit_code = output.get("exit_code", -1)
+
+            stderr = output.get("stderr", "") or ""
+            error = output.get("error", "") or ""
+
+            # Interactive CLI program
+            if "EOFError: EOF when reading a line" in stderr:
+                return FailureAnalysis(
+                    category=FailureCategory.TERMINAL,
+                    retryable=False,
+                    reason=(
+                        "Program requires interactive terminal input "
+                        "and cannot be executed automatically."
+                    ),
+                )
 
             return FailureAnalysis(
                 category=FailureCategory.TERMINAL,
                 retryable=exit_code != 0,
                 reason=(
-                    output.get("stderr") or output.get("error") or "Terminal error."
+                    stderr or error or "Terminal error."
                 ),
             )
 
