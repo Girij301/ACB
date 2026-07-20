@@ -1,5 +1,6 @@
-from app.models.debug_record import DebugRecord
 from sqlalchemy.orm import Session
+
+from app.models.debug_record import DebugRecord
 
 
 class DebugRepository:

@@ -1,8 +1,9 @@
 from urllib.parse import urlparse
 
-from app.core.config import BASE_DIR, settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
+
+from app.core.config import BASE_DIR, settings
 
 # ---------------------------------------------------------------------
 # DATABASE URL (CONFIG DRIVEN WITH SAFE FALLBACK)

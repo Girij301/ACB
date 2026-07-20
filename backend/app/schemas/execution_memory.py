@@ -1,5 +1,6 @@
-from app.schemas.execution import StepResult
 from pydantic import BaseModel, Field
+
+from app.schemas.execution import StepResult
 
 
 class ExecutionMemory(BaseModel):

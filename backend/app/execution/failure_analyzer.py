@@ -74,9 +74,7 @@ class FailureAnalyzer:
             return FailureAnalysis(
                 category=FailureCategory.TERMINAL,
                 retryable=exit_code != 0,
-                reason=(
-                    stderr or error or "Terminal error."
-                ),
+                reason=(stderr or error or "Terminal error."),
             )
 
         # Unknown failures

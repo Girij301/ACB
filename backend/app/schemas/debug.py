@@ -27,10 +27,6 @@ class DebugSuggestion(BaseModel):
     summary: str
     explanation: str
 
-    files: list[FilePatch] = Field(
-        default_factory=list
-    )
+    files: list[FilePatch] = Field(default_factory=list)
 
-    commands: list[CommandPatch] = Field(
-        default_factory=list
-    )
+    commands: list[CommandPatch] = Field(default_factory=list)

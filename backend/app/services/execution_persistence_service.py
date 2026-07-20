@@ -19,7 +19,6 @@ from app.schemas.execution_status import (
 )
 
 
-
 class ExecutionPersistenceService:
     """
     Coordinates persistence operations used by the

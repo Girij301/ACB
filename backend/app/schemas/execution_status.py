@@ -24,4 +24,5 @@ class StepStatus(str, Enum):
     FAILED = "FAILED"
     SKIPPED = "SKIPPED"
 
+
 StepExecutionStatus = StepStatus

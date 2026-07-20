@@ -1,3 +1,5 @@
+from fastapi import APIRouter, Depends, HTTPException
+
 from app.dependencies import get_execution_history_service
 from app.schemas.execution_history import (
     DebugRecordResponse,
@@ -7,7 +9,6 @@ from app.schemas.execution_history import (
     ValidationRecordResponse,
 )
 from app.services.execution_history_service import ExecutionHistoryService
-from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter()
 

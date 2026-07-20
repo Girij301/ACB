@@ -1,3 +1,5 @@
+from fastapi import APIRouter
+
 from app.schemas.common import ToolResponse
 from app.schemas.file_schemas import (
     AppendFileRequest,
@@ -10,7 +12,6 @@ from app.schemas.file_schemas import (
     WriteFileRequest,
 )
 from app.services.file_service import FileService
-from fastapi import APIRouter
 
 router = APIRouter(prefix="/files", tags=["File Tools"])
 

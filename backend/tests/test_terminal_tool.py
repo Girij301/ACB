@@ -1,4 +1,5 @@
 import pytest
+
 from app.tools.terminal_tool import TerminalTool
 
 tool = TerminalTool()

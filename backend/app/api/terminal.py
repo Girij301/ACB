@@ -1,7 +1,8 @@
+from fastapi import APIRouter
+
 from app.schemas.common import ToolResponse
 from app.schemas.terminal import TerminalRequest
 from app.services.terminal_service import TerminalService
-from fastapi import APIRouter
 
 router = APIRouter(prefix="/terminal", tags=["Terminal"])
 

@@ -5,6 +5,11 @@ from time import perf_counter
 from typing import Optional
 
 import docker
+from docker.client import DockerClient
+from docker.errors import APIError, DockerException, ImageNotFound, NotFound
+from docker.models.containers import Container
+from docker.models.images import Image
+
 from app.core.logger import logger
 from app.docker.container_logs import ContainerLogs
 from app.docker.exceptions import (
@@ -20,10 +25,6 @@ from app.docker.exec_result import ExecResult
 from app.docker.execution_info import ExecutionInfo
 from app.docker.execution_result import ExecutionResult
 from app.docker.types import ContainerConfig
-from docker.client import DockerClient
-from docker.errors import APIError, DockerException, ImageNotFound, NotFound
-from docker.models.containers import Container
-from docker.models.images import Image
 
 
 class DockerManager:
@@ -308,7 +309,7 @@ class DockerManager:
             stdout=True,
             stderr=True,
             workdir=workdir,
-        )   
+        )
 
         elapsed = perf_counter() - start
 

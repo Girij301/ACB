@@ -1,7 +1,8 @@
 from collections import defaultdict
 
-from app.core.logger import logger
 from fastapi import WebSocket
+
+from app.core.logger import logger
 
 
 class ConnectionManager:

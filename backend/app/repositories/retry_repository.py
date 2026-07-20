@@ -1,5 +1,6 @@
-from app.models.retry_record import RetryRecord
 from sqlalchemy.orm import Session
+
+from app.models.retry_record import RetryRecord
 
 
 class RetryRepository:

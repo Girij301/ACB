@@ -23,9 +23,7 @@ class WriteFileHandler:
 
         if content is None:
             if not goal:
-                raise ValueError(
-                    "Either 'content' or 'goal' must be provided."
-                )
+                raise ValueError("Either 'content' or 'goal' must be provided.")
 
             content = self.generator.generate(
                 goal=goal,

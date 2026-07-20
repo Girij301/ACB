@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+from docker.models.containers import Container
+
 from app.docker.docker_manager import DockerManager
 from app.docker.exec_result import ExecResult
 from app.docker.types import ContainerConfig
-from docker.models.containers import Container
 
 
 class ExecutionContainer:

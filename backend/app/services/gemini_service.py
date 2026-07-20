@@ -1,10 +1,11 @@
 import time
 
-from app.core.config import settings
-from app.core.logger import logger
 from google import genai
 from google.genai.errors import ServerError
 from google.genai.types import GenerateContentConfig
+
+from app.core.config import settings
+from app.core.logger import logger
 
 
 class GeminiService:

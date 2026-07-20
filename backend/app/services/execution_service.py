@@ -1,5 +1,8 @@
 from pathlib import Path
 from time import perf_counter
+from uuid import uuid4
+
+from sqlalchemy.orm import Session
 
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
@@ -12,9 +15,6 @@ from app.repositories.validation_repository import ValidationRepository
 from app.schemas.execution import ExecutionResult
 from app.schemas.planner import PlanStep
 from app.services.execution_persistence_service import ExecutionPersistenceService
-from sqlalchemy.orm import Session
-
-from uuid import uuid4
 
 
 class ExecutionService:
@@ -68,10 +68,7 @@ class ExecutionService:
             ExecutionResult
         """
 
-        execution_workspace = (
-            workspace
-            / f"execution_{plan_id}_{uuid4().hex[:8]}"
-        )
+        execution_workspace = workspace / f"execution_{plan_id}_{uuid4().hex[:8]}"
         execution_workspace.mkdir(parents=True, exist_ok=True)
 
         context = ExecutionContext(

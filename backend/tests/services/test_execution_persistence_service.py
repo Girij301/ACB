@@ -3,9 +3,13 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from app.models.execution import Execution
-from app.schemas.execution_status import StepExecutionStatus, StepStatus
+from app.schemas.execution_status import (
+    ExecutionStatus,
+    StepExecutionStatus,
+    StepStatus,
+)
 from app.services.execution_persistence_service import ExecutionPersistenceService
-from app.schemas.execution_status import ExecutionStatus
+
 
 def test_create_execution():
     execution_repository = Mock()
@@ -188,6 +192,7 @@ def test_record_validation():
     assert record.duration_ms == 125
     assert execution.validation_count == 1
 
+
 def test_record_retry():
     retry_repository = Mock()
     retry_repository.create.side_effect = lambda record: record
@@ -238,6 +243,7 @@ def test_record_retry():
     assert record.previous_error == "File not found"
     assert record.success is False
     assert execution.retry_count == 1
+
 
 def test_record_debug():
     debug_repository = Mock()

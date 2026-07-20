@@ -1,9 +1,10 @@
+from fastapi import Depends
+from sqlalchemy.orm import Session
+
 from app.core.database import get_db
 from app.repositories.user_repository import UserRepository
 from app.services.clerk_service import ClerkService
 from app.services.user_service import UserService
-from fastapi import Depends
-from sqlalchemy.orm import Session
 
 from .clerk import verify_request
 

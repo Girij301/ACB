@@ -1,5 +1,6 @@
-from app.schemas.validation import ValidationResult
 from pydantic import BaseModel
+
+from app.schemas.validation import ValidationResult
 
 
 class ValidationExecutionResult(BaseModel):

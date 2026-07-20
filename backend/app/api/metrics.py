@@ -1,6 +1,7 @@
+from fastapi import APIRouter
+
 from app.monitoring.execution_metrics import execution_metrics
 from app.schemas.base import APIResponse
-from fastapi import APIRouter
 
 router = APIRouter(
     tags=["Monitoring"],

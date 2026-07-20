@@ -1,5 +1,6 @@
-from app.models.execution import Execution
 from sqlalchemy.orm import Session
+
+from app.models.execution import Execution
 
 
 class ExecutionRepository:

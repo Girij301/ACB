@@ -2,6 +2,9 @@ import asyncio
 import traceback
 from contextlib import asynccontextmanager
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.chat import router as chat_router
 from app.api.execute import router as execute_router
 from app.api.execution_history import router as execution_history_router
@@ -26,8 +29,6 @@ from app.core.logger import logger
 from app.execution.events.global_publisher import execution_event_publisher
 from app.execution.events.subscribers.logging_subscriber import LoggingSubscriber
 from app.execution.events.subscribers.websocket_subscriber import WebSocketSubscriber
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
 
 @asynccontextmanager

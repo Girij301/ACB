@@ -1,10 +1,10 @@
 from unittest.mock import Mock
 
-from app.execution.context import ExecutionContext
 from app.execution.events.event_service import EventService
 from app.execution.events.event_types import ExecutionEventType
-from app.schemas.execution import StepResult, ExecutionStatus
+from app.schemas.execution import ExecutionStatus, StepResult
 from app.schemas.planner import ActionType
+
 
 def test_execution_started_event():
     service = EventService()
@@ -30,6 +30,7 @@ def test_execution_started_event():
     assert event.session_id == "test-session"
     assert event.payload["total_steps"] == 3
     assert event.payload["plan_id"] == 1
+
 
 def test_step_completed_event():
     service = EventService()

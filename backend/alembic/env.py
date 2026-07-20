@@ -1,11 +1,11 @@
 from logging.config import fileConfig
 
+# Import all SQLAlchemy models so they are registered with Base.metadata
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
 from app.core.config import settings
 from app.core.database import Base
-
-# Import all SQLAlchemy models so they are registered with Base.metadata
-from sqlalchemy import engine_from_config, pool
 
 # Alembic Config object
 config = context.config

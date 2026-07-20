@@ -2,6 +2,7 @@ from unittest.mock import Mock
 
 from app.docker.execution_container import ExecutionContainer
 
+
 def test_execution_container_create():
     docker_manager = Mock()
 
@@ -22,6 +23,7 @@ def test_execution_container_create():
     assert container.container == fake_container
     assert container.id == "container-123"
 
+
 def test_execution_container_start():
     docker_manager = Mock()
 
@@ -38,9 +40,8 @@ def test_execution_container_start():
     container.create()
     container.start()
 
-    docker_manager.start_container.assert_called_once_with(
-        "container-123"
-    )
+    docker_manager.start_container.assert_called_once_with("container-123")
+
 
 def test_execution_container_execute():
     docker_manager = Mock()
@@ -73,6 +74,7 @@ def test_execution_container_execute():
 
     assert result == expected_result
 
+
 def test_execution_container_close():
     docker_manager = Mock()
 
@@ -89,14 +91,13 @@ def test_execution_container_close():
     container.create()
     container.close()
 
-    docker_manager.stop_container.assert_called_once_with(
-        "container-123"
-    )
+    docker_manager.stop_container.assert_called_once_with("container-123")
 
     docker_manager.remove_container.assert_called_once_with(
         "container-123",
         force=True,
     )
+
 
 def test_execution_container_close_without_create():
     docker_manager = Mock()
@@ -110,4 +111,3 @@ def test_execution_container_close_without_create():
 
     docker_manager.stop_container.assert_not_called()
     docker_manager.remove_container.assert_not_called()
-

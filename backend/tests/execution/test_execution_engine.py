@@ -69,7 +69,6 @@ class FakeStep:
         self.action = SimpleNamespace(value="CREATE_FILE")
         self.description = "Fake step"
         self.parameters = {}
-        
 
 
 class RetryStepExecutor:
