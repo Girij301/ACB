@@ -20,31 +20,18 @@ class StepResult(BaseModel):
 
 class ExecutionSummary(BaseModel):
     execution_id: int
-
     session_id: str
-
     plan_id: int
-
     status: str
-
     workspace: str
-
     total_steps: int
-
     successful_steps: int
-
     failed_steps: int
-
     retry_count: int
-
     debug_count: int
-
     validation_count: int
-
     duration_ms: int
-
     started_at: datetime
-
     completed_at: datetime | None = None
 
 

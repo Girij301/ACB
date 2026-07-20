@@ -10,6 +10,15 @@ class FilePatch(BaseModel):
     content: str
 
 
+class CommandPatch(BaseModel):
+    """
+    Represents a replacement for a failed terminal command.
+    """
+
+    old: str
+    new: str
+
+
 class DebugSuggestion(BaseModel):
     """
     AI-generated debugging suggestion.
@@ -18,6 +27,10 @@ class DebugSuggestion(BaseModel):
     summary: str
     explanation: str
 
-    files: list[FilePatch] = Field(default_factory=list)
+    files: list[FilePatch] = Field(
+        default_factory=list
+    )
 
-    commands: list[str] = Field(default_factory=list)
+    commands: list[CommandPatch] = Field(
+        default_factory=list
+    )

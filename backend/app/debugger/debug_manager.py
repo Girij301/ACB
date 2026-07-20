@@ -6,8 +6,9 @@ from app.debugger.patch_applier import PatchApplier
 from app.execution.failure_analyzer import FailureAnalyzer
 from app.schemas.execution import StepResult
 from app.schemas.validation import ValidationResult
-
-
+from app.schemas.planner import PlanStep
+from app.schemas.failure import FailureAnalysis
+from app.schemas.debug import DebugSuggestion
 class DebugManager:
     """
     Coordinates the complete debugging workflow.
@@ -28,7 +29,8 @@ class DebugManager:
         result: StepResult | ValidationResult,
         history: list,
         workspace: Path,
-    ):
+        step: PlanStep | None = None,
+    )-> tuple[FailureAnalysis, DebugSuggestion]:
         """
         Analyze a failure, ask Gemini for a fix,
         and apply the generated patch.
@@ -58,6 +60,7 @@ class DebugManager:
         self.patch_applier.apply(
             suggestion=suggestion,
             workspace=workspace,
+            step=step,
         )
 
         return analysis, suggestion

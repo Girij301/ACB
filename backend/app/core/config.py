@@ -40,7 +40,7 @@ class Settings(BaseSettings):
     DOCKER_IMAGE: str = "python:3.12-slim"
     DOCKER_CONTAINER_PREFIX: str = "acb-agent"
     DOCKER_WORKDIR: str = "/workspace"
-    DOCKER_NETWORK_DISABLED: bool = True
+    DOCKER_NETWORK_DISABLED: bool = False
     DOCKER_AUTO_REMOVE: bool = False
     DOCKER_MEMORY_LIMIT: str = "512m"
     DOCKER_NANO_CPUS: int = 1_000_000_000

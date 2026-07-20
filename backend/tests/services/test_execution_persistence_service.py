@@ -3,9 +3,9 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 from app.models.execution import Execution
-from app.schemas.execution_status import ExecutionStatus, StepStatus
+from app.schemas.execution_status import StepExecutionStatus, StepStatus
 from app.services.execution_persistence_service import ExecutionPersistenceService
-
+from app.schemas.execution_status import ExecutionStatus
 
 def test_create_execution():
     execution_repository = Mock()
@@ -27,6 +27,7 @@ def test_create_execution():
     execution = service.create_execution(
         session_id="session-1",
         plan_id=1,
+        total_steps=3,
     )
 
     execution_repository.create.assert_called_once()
@@ -35,6 +36,7 @@ def test_create_execution():
 
     assert created.session_id == "session-1"
     assert created.plan_id == 1
+    assert created.total_steps == 3
     assert created.status == ExecutionStatus.RUNNING.value
     assert created.started_at is not None
 
@@ -55,10 +57,16 @@ def test_complete_execution():
     )
 
     execution = Execution(
+        id=1,
         session_id="session-1",
         plan_id=1,
-        status=ExecutionStatus.RUNNING.value,
+        status="RUNNING",
         started_at=datetime.utcnow() - timedelta(seconds=2),
+        successful_steps=0,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=0,
     )
 
     completed = service.complete_execution(
@@ -90,6 +98,11 @@ def test_record_step():
         session_id="session-1",
         plan_id=1,
         status="RUNNING",
+        successful_steps=0,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=0,
     )
 
     step = SimpleNamespace(
@@ -99,7 +112,7 @@ def test_record_step():
     )
 
     result = SimpleNamespace(
-        status=ExecutionStatus.SUCCESS,
+        status=StepExecutionStatus.SUCCESS,
         output={
             "success": True,
             "message": "Created successfully",
@@ -124,6 +137,8 @@ def test_record_step():
     assert execution_step.duration_ms == 0
     assert execution_step.error is None
     assert execution_step.output is not None
+    assert execution.successful_steps == 1
+    assert execution.failed_steps == 0
 
 
 def test_record_validation():
@@ -143,6 +158,11 @@ def test_record_validation():
         session_id="session-1",
         plan_id=1,
         status="RUNNING",
+        successful_steps=0,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=0,
     )
 
     validation_result = SimpleNamespace(
@@ -166,7 +186,7 @@ def test_record_validation():
     assert record.stdout == "All checks passed"
     assert record.stderr is None
     assert record.duration_ms == 125
-
+    assert execution.validation_count == 1
 
 def test_record_retry():
     retry_repository = Mock()
@@ -185,6 +205,11 @@ def test_record_retry():
         session_id="session-1",
         plan_id=1,
         status="RUNNING",
+        successful_steps=0,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=0,
     )
 
     step = SimpleNamespace(
@@ -212,7 +237,7 @@ def test_record_retry():
     assert record.reason == "Temporary failure"
     assert record.previous_error == "File not found"
     assert record.success is False
-
+    assert execution.retry_count == 1
 
 def test_record_debug():
     debug_repository = Mock()
@@ -231,6 +256,11 @@ def test_record_debug():
         session_id="session-1",
         plan_id=1,
         status="RUNNING",
+        successful_steps=0,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=0,
     )
 
     step = SimpleNamespace(
@@ -254,3 +284,4 @@ def test_record_debug():
     assert record.failure_summary == "Syntax error in main.py"
     assert record.ai_summary == "Added missing colon"
     assert record.success is True
+    assert execution.debug_count == 1

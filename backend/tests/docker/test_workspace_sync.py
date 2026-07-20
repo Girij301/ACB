@@ -1,9 +1,32 @@
 import shutil
+from types import SimpleNamespace
 
 from app.core.config import WORKSPACE_DIR
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
 from app.schemas.planner import ActionType, PlanStep
+
+
+class FakePatchApplier:
+    def apply_command_patches(self, suggestion, step):
+        return step
+
+
+class FakeDebugManager:
+    def __init__(self):
+        self.patch_applier = FakePatchApplier()
+
+    def debug(self, result, history, workspace):
+        return (
+            SimpleNamespace(
+                retryable=False,
+                reason="Test failure",
+                category=SimpleNamespace(value="TEST"),
+            ),
+            SimpleNamespace(
+                patches=[],
+            ),
+        )
 
 
 def test_workspace_sync():
@@ -13,12 +36,14 @@ def test_workspace_sync():
     """
 
     # ------------------------------------------------------------------
-    # Ensure a clean workspace before running the test
+    # Ensure a clean test workspace before running the test
     # ------------------------------------------------------------------
-    if WORKSPACE_DIR.exists():
-        shutil.rmtree(WORKSPACE_DIR)
+    test_workspace = WORKSPACE_DIR / "workspace_sync_test"
 
-    WORKSPACE_DIR.mkdir(parents=True, exist_ok=True)
+    if test_workspace.exists():
+        shutil.rmtree(test_workspace, ignore_errors=True)
+
+    test_workspace.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------
     # Test plan
@@ -57,16 +82,33 @@ def test_workspace_sync():
     context = ExecutionContext(
         session_id="workspace-test",
         plan_id="workspace-test",
-        workspace=WORKSPACE_DIR,
+        workspace=test_workspace,
     )
 
-    engine = ExecutionEngine()
+    # ------------------------------------------------------------------
+    # Execute
+    # ------------------------------------------------------------------
+    engine = ExecutionEngine(
+        debug_manager=FakeDebugManager(),
+    )
 
     result = engine.execute(plan, context)
+
+    # ------------------------------------------------------------------
+    # Debug output
+    # ------------------------------------------------------------------
+    print("\n--- STEP RESULTS ---")
+
+    for step_result in result.steps:
+        print(f"\nSTEP {step_result.step_number}")
+        print("STATUS:", step_result.status)
+        print("OUTPUT:", step_result.output)
 
     # ------------------------------------------------------------------
     # Assertions
     # ------------------------------------------------------------------
     assert result.success
+
     assert result.steps[2].status.value == "success"
+
     assert "Hello Docker" in result.steps[2].output["stdout"]

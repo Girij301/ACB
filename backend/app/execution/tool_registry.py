@@ -40,7 +40,8 @@ class ToolRegistry:
             ActionType.WRITE_FILE: (
                 lambda: self.write_file_handler.execute(
                     relative_path=step.parameters["relative_path"],
-                    goal=step.goal,
+                    content=step.parameters.get("content"),
+                    goal=step.parameters.get("goal"),
                     step_description=step.description,
                 )
             ),

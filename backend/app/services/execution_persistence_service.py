@@ -11,9 +11,13 @@ from app.repositories.execution_repository import ExecutionRepository
 from app.repositories.execution_step_repository import ExecutionStepRepository
 from app.repositories.retry_repository import RetryRepository
 from app.repositories.validation_repository import ValidationRepository
-from app.schemas.execution import ExecutionStatus as StepExecutionStatus
 from app.schemas.execution import ExecutionSummary
-from app.schemas.execution_status import ExecutionStatus, StepStatus
+from app.schemas.execution_status import (
+    ExecutionStatus,
+    StepExecutionStatus,
+    StepStatus,
+)
+
 
 
 class ExecutionPersistenceService:

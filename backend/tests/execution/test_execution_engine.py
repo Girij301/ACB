@@ -1,11 +1,13 @@
+from datetime import datetime
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import Mock
 
+from app.core.config import WORKSPACE_DIR
 from app.execution.context import ExecutionContext
 from app.execution.engine import ExecutionEngine
 from app.models.execution import Execution
-from app.schemas.execution import ExecutionStatus, StepResult
+from app.schemas.execution import ExecutionStatus, ExecutionSummary, StepResult
 from app.schemas.validation import ValidationResult
 from app.schemas.validation_execution import ValidationExecutionResult
 
@@ -64,7 +66,10 @@ class FailureValidationEngine:
 class FakeStep:
     def __init__(self):
         self.step = 1
+        self.action = SimpleNamespace(value="CREATE_FILE")
         self.description = "Fake step"
+        self.parameters = {}
+        
 
 
 class RetryStepExecutor:
@@ -101,11 +106,76 @@ class RetryFailureAnalyzer:
         )
 
 
+class FakePatchApplier:
+    def apply_command_patches(self, suggestion, step):
+        return step
+
+
 class FakeDebugManager:
+    def __init__(self):
+        self.patch_applier = FakePatchApplier()
+
     def debug(self, result, history, workspace):
-        return SimpleNamespace(
+        analysis = SimpleNamespace(
+            reason="Syntax error",
+        )
+
+        suggestion = SimpleNamespace(
             summary="Applied AI fix",
         )
+
+        return analysis, suggestion
+
+
+def create_execution_summary():
+    return ExecutionSummary(
+        execution_id=1,
+        session_id="test-session",
+        plan_id=1,
+        status="RUNNING",
+        workspace=str(WORKSPACE_DIR),
+        total_steps=1,
+        successful_steps=1,
+        failed_steps=0,
+        retry_count=0,
+        debug_count=0,
+        validation_count=1,
+        duration_ms=100,
+        started_at=datetime.now(),
+    )
+
+
+def create_execution():
+    return Execution(
+        id=1,
+        session_id="test-session",
+        plan_id=1,
+        status="RUNNING",
+    )
+
+
+def create_context():
+    context = ExecutionContext(
+        workspace=Path(WORKSPACE_DIR),
+        session_id="test-session",
+        plan_id=1,
+    )
+
+    context.execution = create_execution()
+
+    return context
+
+
+def create_persistence_service():
+    persistence_service = Mock()
+
+    persistence_service.build_execution_summary.return_value = (
+        create_execution_summary()
+    )
+
+    persistence_service.create_execution.return_value = create_execution()
+
+    return persistence_service
 
 
 def test_execution_engine_validation_success():
@@ -115,15 +185,7 @@ def test_execution_engine_validation_success():
     """
 
     validation_engine = SuccessValidationEngine()
-
-    persistence_service = Mock()
-
-    persistence_service.create_execution.return_value = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
+    persistence_service = create_persistence_service()
 
     engine = ExecutionEngine(
         step_executor=FakeStepExecutor(),
@@ -131,22 +193,9 @@ def test_execution_engine_validation_success():
         persistence_service=persistence_service,
     )
 
-    context = ExecutionContext(
-        workspace=Path("."),
-        session_id="test-session",
-        plan_id=1,
-    )
-
-    context.execution = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
-
     result = engine.execute(
         plan=[FakeStep()],
-        context=context,
+        context=create_context(),
     )
 
     assert validation_engine.called is True
@@ -164,15 +213,7 @@ def test_execution_engine_validation_failure():
     """
 
     validation_engine = FailureValidationEngine()
-
-    persistence_service = Mock()
-
-    persistence_service.create_execution.return_value = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
+    persistence_service = create_persistence_service()
 
     engine = ExecutionEngine(
         step_executor=FakeStepExecutor(),
@@ -180,22 +221,9 @@ def test_execution_engine_validation_failure():
         persistence_service=persistence_service,
     )
 
-    context = ExecutionContext(
-        workspace=Path("."),
-        session_id="test-session",
-        plan_id=1,
-    )
-
-    context.execution = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
-
     result = engine.execute(
         plan=[FakeStep()],
-        context=context,
+        context=create_context(),
     )
 
     assert validation_engine.called is True
@@ -208,15 +236,7 @@ def test_execution_engine_validation_failure():
 
 def test_execution_engine_records_retry():
     validation_engine = SuccessValidationEngine()
-
-    persistence_service = Mock()
-
-    persistence_service.create_execution.return_value = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
+    persistence_service = create_persistence_service()
 
     engine = ExecutionEngine(
         step_executor=RetryStepExecutor(),
@@ -225,28 +245,16 @@ def test_execution_engine_records_retry():
         failure_analyzer=RetryFailureAnalyzer(),
     )
 
-    context = ExecutionContext(
-        workspace=Path("."),
-        session_id="test-session",
-        plan_id=1,
-    )
-
-    context.execution = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
-
     step = SimpleNamespace(
         step=1,
         description="Retry step",
         action=SimpleNamespace(value="CREATE_FILE"),
+        parameters={},
     )
 
     result = engine.execute(
         plan=[step],
-        context=context,
+        context=create_context(),
     )
 
     assert result.success is True
@@ -258,14 +266,7 @@ def test_execution_engine_records_retry():
 
 
 def test_execution_engine_records_debug():
-    persistence_service = Mock()
-
-    persistence_service.create_execution.return_value = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
+    persistence_service = create_persistence_service()
 
     class NoRetryAnalyzer:
         def analyze(self, result):
@@ -293,28 +294,16 @@ def test_execution_engine_records_debug():
         failure_analyzer=NoRetryAnalyzer(),
     )
 
-    context = ExecutionContext(
-        workspace=Path("."),
-        session_id="test-session",
-        plan_id=1,
-    )
-
-    context.execution = Execution(
-        id=1,
-        session_id="test-session",
-        plan_id=1,
-        status="RUNNING",
-    )
-
     step = SimpleNamespace(
         step=1,
         description="Failing step",
         action=SimpleNamespace(value="CREATE_FILE"),
+        parameters={},
     )
 
     engine.execute(
         plan=[step],
-        context=context,
+        context=create_context(),
     )
 
     assert (

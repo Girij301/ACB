@@ -75,7 +75,9 @@ class ExecutionEngine:
 
         container = ExecutionContainer(
             DockerManager(),
-            DEFAULT_SANDBOX.to_container_config(),
+            DEFAULT_SANDBOX.to_container_config(
+                workspace_host=context.workspace,
+            ),
         )
 
         container.create()
@@ -161,7 +163,11 @@ class ExecutionEngine:
                                 step=step,
                                 retry_attempt=memory.retry_count,
                                 analysis=analysis,
-                                previous_error=getattr(result, "error", None),
+                                previous_error=(
+                                    result.output.get("error")
+                                    if isinstance(result.output, dict)
+                                    else None
+                                ),
                                 success=False,
                             )
 
@@ -234,13 +240,18 @@ class ExecutionEngine:
                         attempt=memory.ai_fix_attempts,
                     )
 
-                    debug_result = self.debug_manager.debug(
+                    analysis, suggestion = self.debug_manager.debug(
                         result=result,
                         history=[
                             step_result.model_dump()
                             for step_result in memory.step_results
                         ],
                         workspace=context.workspace,
+                    )
+
+                    step = self.debug_manager.patch_applier.apply_command_patches(
+                        suggestion=suggestion,
+                        step=step,
                     )
 
                     if (
@@ -252,19 +263,15 @@ class ExecutionEngine:
                             step=step,
                             attempt_number=memory.ai_fix_attempts,
                             failure_summary=analysis.reason,
-                            ai_summary=(
-                                getattr(debug_result, "summary", None)
-                                if debug_result is not None
-                                else None
-                            ),
-                            success=debug_result is not None,
+                            ai_summary=suggestion.summary,
+                            success=True,
                         )
 
                     self.events.debug_completed(
                         context=context,
                         step=step,
                         attempt=memory.ai_fix_attempts,
-                        success=debug_result is not None,
+                        success=True,
                     )
 
                     logger.info("Retrying step after AI patch...")

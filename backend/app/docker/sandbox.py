@@ -35,10 +35,13 @@ class SandboxConfig:
 
     stdin_open: bool
 
-    def to_container_config(self) -> ContainerConfig:
+    def to_container_config(
+        self,
+        workspace_host: Path | None = None,
+    ) -> ContainerConfig:
         return ContainerConfig(
             image=self.image,
-            workspace_host=self.workspace_host,
+            workspace_host=workspace_host or self.workspace_host,
             workspace_container=self.workspace_container,
             working_directory=self.working_directory,
             command=self.command,

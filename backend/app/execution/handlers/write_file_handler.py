@@ -10,16 +10,30 @@ class WriteFileHandler:
     def execute(
         self,
         relative_path: str,
-        goal: str,
-        step_description: str,
+        content: str | None = None,
+        goal: str | None = None,
+        step_description: str | None = None,
     ):
-        code = self.generator.generate(
-            goal=goal,
-            step_description=step_description,
-            relative_path=relative_path,
-        )
+        """
+        Write content to an existing file.
+
+        If explicit content is provided, write it directly.
+        Otherwise, generate the content using the AI generation service.
+        """
+
+        if content is None:
+            if not goal:
+                raise ValueError(
+                    "Either 'content' or 'goal' must be provided."
+                )
+
+            content = self.generator.generate(
+                goal=goal,
+                step_description=step_description or "",
+                relative_path=relative_path,
+            )
 
         return self.file_tool.write_file(
             relative_path=relative_path,
-            content=code,
+            content=content,
         )
