@@ -198,10 +198,29 @@ class ExecutionEngine:
                         f"Step {step.step} failed after "
                         f"{memory.retry_count} retries."
                     )
+    
+
+                    # ---------------------------------------------------------
+                    # RETRY EXHAUSTED / NON-RETRYABLE FAILURE
+                    # ---------------------------------------------------------
+
+                    if not analysis.retryable:
+
+                        logger.warning(
+                            "Non-retryable failure detected. "
+                            "Skipping automatic retries and requesting AI debugging."
+                        )
+
+                    # ---------------------------------------------------------
+                    # AI DEBUGGING
+                    # ---------------------------------------------------------
 
                     memory.increment_ai_fix_attempt()
 
-                    if memory.ai_fix_attempts > self.retry_engine.max_ai_fix_attempts:
+                    if (
+                        memory.ai_fix_attempts
+                        > self.retry_engine.max_ai_fix_attempts
+                    ):
 
                         logger.error("Maximum AI fix attempts reached.")
 
@@ -213,6 +232,7 @@ class ExecutionEngine:
                                 execution=context.execution,
                                 success=False,
                             )
+
                         summary = self._build_result(
                             success=False,
                             memory=memory,
@@ -226,6 +246,7 @@ class ExecutionEngine:
                         )
 
                         finished_event_sent = True
+
                         return self._build_result(
                             success=False,
                             memory=memory,

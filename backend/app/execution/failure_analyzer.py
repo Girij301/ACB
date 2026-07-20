@@ -51,8 +51,7 @@ class FailureAnalyzer:
                     "Filesystem error.",
                 ),
             )
-
-        # Terminal failures
+        
         # Terminal failures
         if action == ActionType.RUN_TERMINAL.value:
             exit_code = output.get("exit_code", -1)
@@ -60,14 +59,35 @@ class FailureAnalyzer:
             stderr = output.get("stderr", "") or ""
             error = output.get("error", "") or ""
 
+            combined_output = f"{stderr}\n{error}".lower()
+
             # Interactive CLI program
-            if "EOFError: EOF when reading a line" in stderr:
+            if (
+                "eoferror: eof when reading a line" in combined_output
+                or "input(" in combined_output
+                or "requires interactive" in combined_output
+            ):
                 return FailureAnalysis(
                     category=FailureCategory.TERMINAL,
                     retryable=False,
                     reason=(
                         "Program requires interactive terminal input "
                         "and cannot be executed automatically."
+                    ),
+                )
+
+            # Missing command-line arguments
+            if (
+                "usage:" in combined_output
+                or "missing required arguments" in combined_output
+                or "the following arguments are required" in combined_output
+            ):
+                return FailureAnalysis(
+                    category=FailureCategory.TERMINAL,
+                    retryable=False,
+                    reason=(
+                        "The command requires additional input or "
+                        "command-line arguments."
                     ),
                 )
 
