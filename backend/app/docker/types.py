@@ -66,6 +66,8 @@ class ContainerConfig:
 
     stdin_open: bool = False
 
+    workspace_volume: str = "acb_workspaces"
+
 
 @dataclass
 class ContainerInfo:

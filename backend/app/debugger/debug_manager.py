@@ -32,7 +32,11 @@ class DebugManager:
         history: list,
         workspace: Path,
         step: PlanStep | None = None,
-    ) -> tuple[FailureAnalysis, DebugSuggestion]:
+    ) -> tuple[
+        FailureAnalysis,
+        DebugSuggestion,
+        PlanStep | None,
+    ]:
         """
         Analyze a failure, ask Gemini for a fix,
         and apply the generated patch.
@@ -57,12 +61,22 @@ class DebugManager:
             history=history,
         )
 
+        
+
         logger.info("Debug Suggestion | " f"Summary={suggestion.summary}")
 
         self.patch_applier.apply(
             suggestion=suggestion,
             workspace=workspace,
-            step=step,
         )
 
-        return analysis, suggestion
+
+        patched_step = step
+
+        if step is not None:
+            patched_step = self.patch_applier.apply_command_patches(
+                suggestion=suggestion,
+                step=step,
+            )
+
+        return analysis, suggestion, patched_step

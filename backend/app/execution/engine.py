@@ -72,11 +72,16 @@ class ExecutionEngine:
         memory = ExecutionMemory()
 
         finished_event_sent = False
+        ai_debugging = False
+
+        docker_manager = DockerManager()
 
         container = ExecutionContainer(
-            DockerManager(),
+            docker_manager,
             DEFAULT_SANDBOX.to_container_config(
-                workspace_host=context.workspace,
+                workspace_host=docker_manager.resolve_host_workspace(
+                    context.workspace,
+                ),
             ),
         )
 
@@ -102,6 +107,8 @@ class ExecutionEngine:
 
                 memory.reset_retry()
                 memory.reset_ai_fix_attempts()
+                
+                ai_debugging = False
 
                 while True:
 
@@ -198,7 +205,6 @@ class ExecutionEngine:
                         f"Step {step.step} failed after "
                         f"{memory.retry_count} retries."
                     )
-    
 
                     # ---------------------------------------------------------
                     # RETRY EXHAUSTED / NON-RETRYABLE FAILURE
@@ -217,10 +223,7 @@ class ExecutionEngine:
 
                     memory.increment_ai_fix_attempt()
 
-                    if (
-                        memory.ai_fix_attempts
-                        > self.retry_engine.max_ai_fix_attempts
-                    ):
+                    if memory.ai_fix_attempts > self.retry_engine.max_ai_fix_attempts:
 
                         logger.error("Maximum AI fix attempts reached.")
 
@@ -261,19 +264,18 @@ class ExecutionEngine:
                         attempt=memory.ai_fix_attempts,
                     )
 
-                    analysis, suggestion = self.debug_manager.debug(
+                    analysis, suggestion, patched_step = self.debug_manager.debug(
                         result=result,
                         history=[
                             step_result.model_dump()
                             for step_result in memory.step_results
                         ],
                         workspace=context.workspace,
-                    )
-
-                    step = self.debug_manager.patch_applier.apply_command_patches(
-                        suggestion=suggestion,
                         step=step,
                     )
+
+                    if patched_step is not None:
+                        step = patched_step
 
                     if (
                         self.persistence_service is not None
@@ -298,6 +300,7 @@ class ExecutionEngine:
                     logger.info("Retrying step after AI patch...")
 
                     memory.reset_retry()
+                    ai_debugging = True
 
             self.events.validation_started(
                 context=context,

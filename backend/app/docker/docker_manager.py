@@ -3,7 +3,9 @@ from __future__ import annotations
 import time
 from time import perf_counter
 from typing import Optional
+from pathlib import Path
 
+from app.core.config import settings
 import docker
 from docker.client import DockerClient
 from docker.errors import APIError, DockerException, ImageNotFound, NotFound
@@ -99,6 +101,12 @@ class DockerManager:
         logger.info(
             "Creating Docker container using image '%s'.",
             config.image,
+        )
+
+        logger.info(
+            "Docker workspace mount: host=%s -> container=%s",
+            str(config.workspace_host),
+            config.workspace_container,
         )
 
         container = self.client.containers.create(
@@ -292,6 +300,12 @@ class DockerManager:
 
         if cwd:
             workdir = f"/workspace/{cwd.strip('/')}"
+
+        logger.info(
+            "Resolved execution cwd: host=%s container=%s",
+            cwd,
+            workdir,
+        )
 
         logger.info(
             "Executing inside container %s (cwd=%s): %s",
@@ -581,3 +595,20 @@ class DockerManager:
 
             finally:
                 self._client = None
+    #Helper method for docker
+    def resolve_host_workspace(
+        self,
+        workspace_path: Path,
+    ) -> Path:
+        workspace_root = settings.WORKSPACE_DIR
+
+        relative_path = workspace_path.relative_to(
+            workspace_root
+        )
+
+        host_workspace = (
+            settings.DOCKER_WORKSPACE_HOST_DIR
+            / relative_path
+        )
+
+        return host_workspace

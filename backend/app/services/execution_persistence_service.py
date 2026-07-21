@@ -11,9 +11,8 @@ from app.repositories.execution_repository import ExecutionRepository
 from app.repositories.execution_step_repository import ExecutionStepRepository
 from app.repositories.retry_repository import RetryRepository
 from app.repositories.validation_repository import ValidationRepository
-from app.schemas.execution import ExecutionSummary
+from app.schemas.execution import ExecutionSummary, ExecutionStatus
 from app.schemas.execution_status import (
-    ExecutionStatus,
     StepExecutionStatus,
     StepStatus,
 )
@@ -23,10 +22,6 @@ class ExecutionPersistenceService:
     """
     Coordinates persistence operations used by the
     execution engine.
-
-    This service provides a clean interface for the
-    execution engine while delegating database access
-    to the repository layer.
     """
 
     def __init__(
@@ -48,10 +43,6 @@ class ExecutionPersistenceService:
         execution: Execution,
         workspace: str,
     ) -> ExecutionSummary:
-        """
-        Convert an Execution model into an API response model.
-        """
-
         return ExecutionSummary(
             execution_id=execution.id,
             session_id=execution.session_id,
@@ -75,16 +66,17 @@ class ExecutionPersistenceService:
         plan_id: int,
         total_steps: int,
     ) -> Execution:
-        """
-        Create a new execution record when an execution starts.
-        """
-
         execution = Execution(
             session_id=session_id,
             plan_id=plan_id,
             status=ExecutionStatus.RUNNING.value,
             started_at=datetime.utcnow(),
             total_steps=total_steps,
+            successful_steps=0,
+            failed_steps=0,
+            retry_count=0,
+            debug_count=0,
+            validation_count=0,
         )
 
         return self.execution_repository.create(execution)
@@ -94,11 +86,6 @@ class ExecutionPersistenceService:
         execution: Execution,
         success: bool,
     ) -> Execution:
-        """
-        Mark an execution as completed and persist
-        the final execution metadata.
-        """
-
         completed_at = datetime.utcnow()
 
         execution.completed_at = completed_at
@@ -109,7 +96,9 @@ class ExecutionPersistenceService:
             )
 
         execution.status = (
-            ExecutionStatus.SUCCESS.value if success else ExecutionStatus.FAILED.value
+            ExecutionStatus.SUCCESS.value
+            if success
+            else ExecutionStatus.FAILED.value
         )
 
         return self.execution_repository.update(execution)
@@ -124,7 +113,9 @@ class ExecutionPersistenceService:
         Persist a single execution step.
         """
 
-        if result.status == StepExecutionStatus.SUCCESS:
+        step_succeeded = result.status == StepExecutionStatus.SUCCESS
+
+        if step_succeeded:
             execution.successful_steps += 1
         else:
             execution.failed_steps += 1
@@ -142,12 +133,20 @@ class ExecutionPersistenceService:
             description=step.description,
             status=(
                 StepStatus.SUCCESS.value
-                if result.status == StepExecutionStatus.SUCCESS
+                if step_succeeded
                 else StepStatus.FAILED.value
             ),
             tool_name=None,
-            output=(json.dumps(output, indent=2) if output is not None else None),
-            error=(output.get("error") if isinstance(output, dict) else None),
+            output=(
+                json.dumps(output, indent=2)
+                if output is not None
+                else None
+            ),
+            error=(
+                output.get("error")
+                if isinstance(output, dict)
+                else None
+            ),
             duration_ms=0,
             started_at=now,
             completed_at=now,
@@ -160,10 +159,6 @@ class ExecutionPersistenceService:
         execution: Execution,
         validation_result,
     ) -> ValidationRecord:
-        """
-        Persist a validation result.
-        """
-
         execution.validation_count += 1
         self.execution_repository.update(execution)
 
@@ -199,10 +194,6 @@ class ExecutionPersistenceService:
         previous_error: str | None,
         success: bool,
     ) -> RetryRecord:
-        """
-        Persist a retry attempt.
-        """
-
         execution.retry_count += 1
         self.execution_repository.update(execution)
 
@@ -226,10 +217,6 @@ class ExecutionPersistenceService:
         ai_summary: str | None,
         success: bool,
     ) -> DebugRecord:
-        """
-        Persist an AI debugging attempt.
-        """
-
         execution.debug_count += 1
         self.execution_repository.update(execution)
 

@@ -1,14 +1,8 @@
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-client = TestClient(app)
-
 
 @patch("app.api.chat.service.generate_response")
-def test_chat_endpoint(mock_generate_response):
+def test_chat_endpoint(mock_generate_response, client):
 
     mock_generate_response.return_value = "Hello! How can I help you?"
 

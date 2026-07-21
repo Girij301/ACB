@@ -21,17 +21,22 @@ class Settings(BaseSettings):
     # =========================
     CLERK_SECRET_KEY: str
     CLERK_PUBLISHABLE_KEY: str | None = None
-    CLERK_AUTHORIZED_PARTIES: str = "http://localhost:5173"
+    CLERK_AUTHORIZED_PARTIES: str
 
     # =========================
     # Database
     # =========================
-    DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'chat.db'}"
+    DATABASE_URL: str
 
     # =========================
     # Workspace
     # =========================
-    WORKSPACE_DIR: Path = BASE_DIR / "workspace"
+    WORKSPACE_DIR: Path 
+
+    # =========================
+    # Application
+    # =========================
+    APP_ENV: str = "development"
 
     # =========================
     # Docker
@@ -44,7 +49,7 @@ class Settings(BaseSettings):
     DOCKER_AUTO_REMOVE: bool = False
     DOCKER_MEMORY_LIMIT: str = "512m"
     DOCKER_NANO_CPUS: int = 1_000_000_000
-
+    DOCKER_WORKSPACE_HOST_DIR: Path
     # =========================
     # Memory
     # =========================
@@ -74,7 +79,7 @@ class Settings(BaseSettings):
     # =========================
     # Logging
     # =========================
-    DEBUG: bool = True
+    DEBUG: bool = False
 
     LOG_LEVEL: str = "INFO"
 
@@ -91,7 +96,7 @@ class Settings(BaseSettings):
     # =========================
     # CORS
     # =========================
-    ALLOWED_ORIGINS: str = "http://localhost:3000"
+    ALLOWED_ORIGINS: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

@@ -4,7 +4,6 @@ import {
   WorkspaceStatusBar,
 } from "@/components/workspace";
 
-import { workspaceVariants } from "./workspaceVariants";
 
 export function Workspace() {
   return (

@@ -9,9 +9,7 @@ from app.core.config import BASE_DIR, settings
 # DATABASE URL (CONFIG DRIVEN WITH SAFE FALLBACK)
 # ---------------------------------------------------------------------
 
-DEFAULT_SQLITE_PATH = BASE_DIR / "chat.db"
-
-DATABASE_URL = settings.DATABASE_URL or f"sqlite:///{DEFAULT_SQLITE_PATH}"
+DATABASE_URL = settings.DATABASE_URL
 
 # ---------------------------------------------------------------------
 # VALIDATE DATABASE URL

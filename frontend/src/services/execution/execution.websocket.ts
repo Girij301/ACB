@@ -1,8 +1,6 @@
 import type { ExecutionEvent } from "./types";
 
-export type ExecutionEventHandler = (
-  event: ExecutionEvent,
-) => void;
+export type ExecutionEventHandler = (event: ExecutionEvent) => void;
 
 export class ExecutionWebSocketService {
   private socket: WebSocket | null = null;
@@ -40,11 +38,7 @@ export class ExecutionWebSocketService {
 
     this.cleanup();
 
-    const apiUrl = import.meta.env.VITE_API_URL;
-
-    const websocketUrl = apiUrl
-      .replace(/^http/, "ws")
-      .replace(/\/$/, "");
+    const websocketUrl = import.meta.env.VITE_WS_URL;
 
     this.socket = new WebSocket(
       `${websocketUrl}/ws/${this.sessionId}`,
@@ -60,16 +54,11 @@ export class ExecutionWebSocketService {
       }
 
       try {
-        const event = JSON.parse(
-          message.data,
-        ) as ExecutionEvent;
+        const event = JSON.parse(message.data) as ExecutionEvent;
 
         onEvent(event);
       } catch (error) {
-        console.warn(
-          "Ignoring malformed execution event.",
-          error,
-        );
+        console.warn("Ignoring malformed execution event.", error);
       }
     };
 
@@ -89,8 +78,6 @@ export class ExecutionWebSocketService {
   }
 
   get isConnected(): boolean {
-    return (
-      this.socket?.readyState === WebSocket.OPEN
-    );
+    return this.socket?.readyState === WebSocket.OPEN;
   }
 }

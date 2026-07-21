@@ -64,4 +64,4 @@ def test_step_completed_event():
 
     assert event.type == ExecutionEventType.STEP_COMPLETED
     assert event.step_number == 1
-    assert event.payload["status"] == "success"
+    assert event.payload["status"] == "SUCCESS"

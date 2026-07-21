@@ -17,22 +17,30 @@ WORKDIR /app
 # -----------------------------------------------------
 # Install System Dependencies
 # -----------------------------------------------------
-RUN apt-get update && apt-get install -y \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    gcc && \
+    rm -rf /var/lib/apt/lists/*
 
 # -----------------------------------------------------
 # Install Python Dependencies
 # -----------------------------------------------------
 COPY requirements.txt .
 
-RUN pip install --upgrade pip && \
-    pip install --default-timeout=300 --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+    --default-timeout=300 \
+    -r requirements.txt
 
 # -----------------------------------------------------
-# Copy Project
+# Copy Application
 # -----------------------------------------------------
 COPY . .
+
+# -----------------------------------------------------
+# Create Runtime Workspace
+# -----------------------------------------------------
+RUN mkdir -p /app/workspace
 
 # -----------------------------------------------------
 # Expose FastAPI Port

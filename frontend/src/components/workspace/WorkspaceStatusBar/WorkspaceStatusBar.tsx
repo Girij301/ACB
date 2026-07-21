@@ -1,7 +1,6 @@
 import {
   CheckCircle2,
   LoaderCircle,
-  Wifi,
 } from "lucide-react";
 
 import { useExecution } from "@/hooks";

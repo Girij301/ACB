@@ -19,6 +19,16 @@ class CommandPatch(BaseModel):
     new: str
 
 
+class DependencyPatch(BaseModel):
+    """
+    Represents a dependency that must be installed
+    before retrying the failed command.
+    """
+
+    package: str
+    manager: str = "pip"
+
+
 class DebugSuggestion(BaseModel):
     """
     AI-generated debugging suggestion.
@@ -30,3 +40,5 @@ class DebugSuggestion(BaseModel):
     files: list[FilePatch] = Field(default_factory=list)
 
     commands: list[CommandPatch] = Field(default_factory=list)
+
+    dependencies: list[DependencyPatch] = Field(default_factory=list)

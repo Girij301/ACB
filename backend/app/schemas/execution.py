@@ -1,13 +1,8 @@
 from datetime import datetime
-from enum import Enum
 
 from pydantic import BaseModel
 
-
-class ExecutionStatus(str, Enum):
-    SUCCESS = "success"
-    FAILED = "failed"
-    PENDING = "pending"
+from app.schemas.execution_status import ExecutionStatus
 
 
 class StepResult(BaseModel):
@@ -37,7 +32,5 @@ class ExecutionSummary(BaseModel):
 
 class ExecutionResult(BaseModel):
     success: bool
-
     steps: list[StepResult]
-
     execution: ExecutionSummary | None = None

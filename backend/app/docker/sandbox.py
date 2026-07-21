@@ -53,6 +53,7 @@ class SandboxConfig:
             auto_remove=self.auto_remove,
             tty=self.tty,
             stdin_open=self.stdin_open,
+            workspace_volume="acb_workspace",
         )
 
 

@@ -114,7 +114,7 @@ class FakeDebugManager:
     def __init__(self):
         self.patch_applier = FakePatchApplier()
 
-    def debug(self, result, history, workspace):
+    def debug(self, result, history, workspace, step):
         analysis = SimpleNamespace(
             reason="Syntax error",
         )
@@ -123,7 +123,7 @@ class FakeDebugManager:
             summary="Applied AI fix",
         )
 
-        return analysis, suggestion
+        return analysis, suggestion, step
 
 
 def create_execution_summary():

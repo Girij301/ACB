@@ -1,5 +1,6 @@
 import time
 
+import httpx
 from google import genai
 from google.genai.errors import ClientError, ServerError
 from google.genai.types import GenerateContentConfig
@@ -96,6 +97,34 @@ class GeminiService:
                 if retry_number == max_retries:
                     logger.error(
                         "Maximum Gemini retry attempts reached."
+                    )
+                    raise
+
+                wait_time = 2**attempt
+
+                logger.info(
+                    f"Retrying Gemini request in "
+                    f"{wait_time} seconds..."
+                )
+
+                time.sleep(wait_time)
+
+            except (
+                httpx.RemoteProtocolError,
+                httpx.ConnectError,
+                httpx.ReadTimeout,
+                httpx.ConnectTimeout,
+            ) as exc:
+                retry_number = attempt + 1
+
+                logger.warning(
+                    f"Gemini network error "
+                    f"(attempt {retry_number}/{max_retries}): {exc}"
+                )
+
+                if retry_number == max_retries:
+                    logger.error(
+                        "Maximum Gemini network retry attempts reached."
                     )
                     raise
 

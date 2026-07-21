@@ -5,6 +5,11 @@ from app.schemas.chat import ChatRequest, ChatResponse
 from app.services.gemini_service import GeminiService
 from app.services.memory import get_chat_history, save_message
 
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
+
 router = APIRouter()
 
 service = GeminiService()
@@ -63,17 +68,24 @@ Respond exactly in this style.
 
 
 @router.post("/chat", response_model=ChatResponse)
-def chat(request: ChatRequest):
+def chat(
+    request: ChatRequest,
+    db: Session = Depends(get_db),
+):
 
     logger.info(f"Incoming request: {request.message}")
 
     save_message(
+        db=db,
         session_id=request.session_id,
         role="user",
         content=request.message,
     )
 
-    history = get_chat_history(request.session_id)
+    history = get_chat_history(
+        db=db,
+        session_id=request.session_id,
+    )
 
     conversation = SYSTEM_PROMPT + "\n\nConversation History:\n"
 
@@ -92,6 +104,7 @@ def chat(request: ChatRequest):
     )
 
     save_message(
+        db=db,
         session_id=request.session_id,
         role="assistant",
         content=reply,
