@@ -3,7 +3,7 @@ from pathlib import Path
 from app.schemas.debug import DebugSuggestion
 from app.schemas.planner import PlanStep
 from app.tools.file_tool import FileTool
-
+from app.core.logger import logger
 
 class PatchApplier:
     """
@@ -31,13 +31,15 @@ class PatchApplier:
                     relative_path=patch.path,
                     content=patch.content,
                 )
+                logger.info("Applying patch to %s", patch.path)
 
             else:
                 file_tool.create_file(
                     relative_path=patch.path,
                     content=patch.content,
                 )
-
+                logger.info("Updated %s", patch.path)
+                logger.info("Created %s", patch.path)
     def apply_command_patches(
         self,
         suggestion: DebugSuggestion,
@@ -48,24 +50,25 @@ class PatchApplier:
         to the current plan step.
         """
 
-        command = step.parameters.get("command")
+        updated_parameters = dict(step.parameters)
 
-        if not command:
-            return step
+        # Patch terminal commands
+        command = updated_parameters.get("command")
 
-        for patch in suggestion.commands:
+        if command:
+            for patch in suggestion.commands:
+                if patch.old == command:
+                    updated_parameters["command"] = patch.new
 
-            if patch.old == command:
+        # Remove invalid parameter for append_file
+        if (
+            step.action.value == "append_file"
+            and "goal" in updated_parameters
+        ):
+            updated_parameters.pop("goal")
 
-                updated_parameters = {
-                    **step.parameters,
-                    "command": patch.new,
-                }
-
-                return step.model_copy(
-                    update={
-                        "parameters": updated_parameters,
-                    }
-                )
-
-        return step
+        return step.model_copy(
+            update={
+                "parameters": updated_parameters,
+            }
+        )

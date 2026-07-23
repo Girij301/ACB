@@ -23,6 +23,7 @@ class DebugAgent:
         self,
         failure: dict,
         history: list,
+        workspace_snapshot: list,
     ) -> DebugSuggestion:
         """
         Analyze a failed execution and return
@@ -31,12 +32,29 @@ class DebugAgent:
         prompt = DEBUG_PROMPT.format(
             failure=json.dumps(failure, indent=2),
             history=json.dumps(history, indent=2),
+            workspace_snapshot=json.dumps(workspace_snapshot, indent=2),
         )
 
         logger.info("Sending failure to Gemini Debug Agent...")
 
         response = self.gemini.generate_response(prompt)
+        logger.info("Raw Gemini response:\n%s", response)
 
-        logger.info("Received debugging suggestion from Gemini.")
+        logger.info("Raw Debug Response:")
+        logger.info(response)
 
-        return ResponseParser.parse_debug_response(response)
+        suggestion = ResponseParser.parse_debug_response(response)
+
+        logger.info(
+            "Parsed Debug Suggestion | Files=%d Commands=%d Dependencies=%d",
+            len(suggestion.files),
+            len(suggestion.commands),
+            len(suggestion.dependencies),
+        )
+        logger.info(
+            "Parsed Debug Suggestion | "
+            f"Files={len(suggestion.files)} "
+            f"Commands={len(suggestion.commands)}"
+        )
+
+        return suggestion

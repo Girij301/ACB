@@ -46,7 +46,13 @@ class ToolRegistry:
                 )
             ),
             ActionType.APPEND_FILE: (
-                lambda: self.file_tool.append_file(**step.parameters)
+                lambda: self.file_tool.append_file(
+                    relative_path=step.parameters["relative_path"],
+                    content=step.parameters.get(
+                        "content",
+                        step.parameters.get("goal", ""),
+                    ),
+                )
             ),
             ActionType.READ_FILE: (lambda: self.file_tool.read_file(**step.parameters)),
             ActionType.DELETE_FILE: (

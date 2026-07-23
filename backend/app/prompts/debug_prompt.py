@@ -106,4 +106,6 @@ Failure Details:
 
 Execution History:
 {history}
+Workspace Files:
+{workspace_snapshot}
 """
