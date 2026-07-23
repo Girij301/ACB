@@ -34,7 +34,7 @@ class ContainerConfig:
 
     # Workspace
 
-    workspace_host: Path
+    workspace_host: Path | str
 
     workspace_container: str
 

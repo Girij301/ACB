@@ -15,6 +15,7 @@ class PatchApplier:
         self,
         suggestion: DebugSuggestion,
         workspace: Path,
+        cwd: str | None = None,
     ) -> None:
         """
         Apply all file modifications.
@@ -26,20 +27,29 @@ class PatchApplier:
 
         for patch in suggestion.files:
 
-            if file_tool.exists(patch.path):
+            relative_path = patch.path
+
+            if not file_tool.exists(relative_path) and cwd:
+                candidate = f"{cwd.rstrip('/')}/{relative_path.lstrip('/')}"
+                if file_tool.exists(candidate):
+                    relative_path = candidate
+
+            if file_tool.exists(relative_path):
                 file_tool.write_file(
-                    relative_path=patch.path,
+                    relative_path=relative_path,
                     content=patch.content,
                 )
-                logger.info("Applying patch to %s", patch.path)
+                logger.info("Updated %s", relative_path)
 
             else:
+                if cwd and not relative_path.startswith(cwd):
+                    relative_path = f"{cwd.rstrip('/')}/{relative_path.lstrip('/')}"
+
                 file_tool.create_file(
-                    relative_path=patch.path,
+                    relative_path=relative_path,
                     content=patch.content,
                 )
-                logger.info("Updated %s", patch.path)
-                logger.info("Created %s", patch.path)
+                logger.info("Created %s", relative_path)
     def apply_command_patches(
         self,
         suggestion: DebugSuggestion,

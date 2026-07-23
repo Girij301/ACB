@@ -599,7 +599,7 @@ class DockerManager:
     def resolve_host_workspace(
         self,
         workspace_path: Path,
-    ) -> Path:
+    ) -> str:
         workspace_root = settings.WORKSPACE_DIR
 
         relative_path = workspace_path.relative_to(
@@ -607,8 +607,9 @@ class DockerManager:
         )
 
         host_workspace = (
-            settings.DOCKER_WORKSPACE_HOST_DIR
-            / relative_path
+            settings.DOCKER_WORKSPACE_HOST_DIR.rstrip("\\/")
+            + "\\"
+            + "\\".join(relative_path.parts)
         )
 
         return host_workspace

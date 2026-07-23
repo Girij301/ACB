@@ -56,6 +56,10 @@ Rules:
 - Do not merely explain that a dependency should be installed.
   Provide the actual executable command in the "commands" array.
 
+File path rules:
+- Every path in "files" MUST be the full path relative to the workspace root, exactly as shown in "Workspace Files" below (e.g. "python-calculator/calculator.py", not "calculator.py").
+- Do not shorten or omit parent directories from file paths.
+
 DEPENDENCY RULES:
 
 If the failure is caused by a missing Python package such as:

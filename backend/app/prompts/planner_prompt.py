@@ -166,6 +166,12 @@ PLANNING RULES
 
 25. Return ONLY valid JSON.
 
+26. Never generate a run_terminal step that directly executes a script requiring interactive stdin input (e.g. scripts using input() in Python or readline in Node) without piping input. If a script requires user input, either:
+    a) supply test input via shell piping, e.g. "echo '5\n3\n+' | python3 calculator.py", or
+    b) rely on unit tests as the validation step instead of running the interactive script directly.
+    
+27. Prefer validating functionality through unit tests (run_terminal executing test files) rather than direct execution of interactive programs.
+
 ----------------------------------------
 EXAMPLE
 ----------------------------------------

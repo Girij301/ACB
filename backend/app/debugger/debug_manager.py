@@ -78,10 +78,13 @@ class DebugManager:
 
         logger.info("Debug Suggestion | " f"Summary={suggestion.summary}")
 
+        cwd = step.parameters.get("cwd") if step is not None else None
+
         self.patch_applier.apply(
             suggestion=suggestion,
             workspace=workspace,
-        )   
+            cwd=cwd,
+        )  
         if (
             not suggestion.files
             and not suggestion.commands

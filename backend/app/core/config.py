@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     DOCKER_AUTO_REMOVE: bool = False
     DOCKER_MEMORY_LIMIT: str = "512m"
     DOCKER_NANO_CPUS: int = 1_000_000_000
-    DOCKER_WORKSPACE_HOST_DIR: Path
+    DOCKER_WORKSPACE_HOST_DIR: str
     # =========================
     # Memory
     # =========================
