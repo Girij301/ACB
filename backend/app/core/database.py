@@ -31,6 +31,8 @@ connect_args = {}
 if db_dialect == "sqlite":
     connect_args = {"check_same_thread": False}
 
+elif db_dialect == "postgresql":
+    connect_args = {"prepare_threshold": None}
 
 # ---------------------------------------------------------------------
 # ENGINE

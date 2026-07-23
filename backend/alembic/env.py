@@ -6,12 +6,14 @@ from sqlalchemy import engine_from_config, pool
 from alembic import context
 from app.core.config import settings
 from app.core.database import Base
+from sqlalchemy import create_engine
 
 # Alembic Config object
 config = context.config
 
 # Use application's DATABASE_URL
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+migration_url = settings.DATABASE_URL_MIGRATIONS or settings.DATABASE_URL
+config.set_main_option("sqlalchemy.url", migration_url)
 
 # Configure logging
 if config.config_file_name is not None:
@@ -39,12 +41,10 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
-    """Run migrations in online mode."""
-
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
+    connectable = create_engine(
+        settings.DATABASE_URL,
         poolclass=pool.NullPool,
+        connect_args={"prepare_threshold": None},
     )
 
     with connectable.connect() as connection:

@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     # Database
     # =========================
     DATABASE_URL: str
+    DATABASE_URL_MIGRATIONS: str | None = None
 
     # =========================
     # Workspace
