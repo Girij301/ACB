@@ -15,9 +15,6 @@ services:
     environment:
       WORKSPACE_DIR: /app/workspace
 
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-
     volumes:
       # Shared workspace volume
       - ./workspace:/app/workspace
@@ -46,8 +43,3 @@ services:
       - backend
 
     restart: unless-stopped
-
-
-volumes:
-  acb_workspace:
-    name: acb_workspace
